@@ -6,7 +6,6 @@ routes = Blueprint('routes', __name__)
 
 @routes.route('/')
 def do_order():
-
     return render_template("order.html")
 
 
