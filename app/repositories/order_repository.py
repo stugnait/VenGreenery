@@ -20,7 +20,7 @@ class OrderRepository:
 
     @staticmethod
     def create(full_name, email, phone, payment, status):
-        new_order = Order(full_name=full_name, email=email, phone=phone,)
+        new_order = Order(full_name=full_name, email=email, phone=phone, payment=payment,status=status)
         db.session.add(new_order)
         db.session.commit()
         return new_order
