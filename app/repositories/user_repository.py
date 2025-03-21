@@ -7,15 +7,15 @@ class UserRepository:
         return User.query.all()
 
     @staticmethod
-    def get_user_by_id(user_id):
+    def get_user_by_id(user_id) -> User:
         return User.query.get(user_id)
 
     @staticmethod
-    def get_user_by_email(email):
+    def get_user_by_email(email) -> User:
         return User.query.filter_by(email=email).first()
 
     @staticmethod
-    def get_user_by_phone(phone):
+    def get_user_by_phone(phone) -> User:
         return User.query.filter_by(phone=phone).first()
 
     @staticmethod
