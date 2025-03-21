@@ -1,10 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard</title>
+    <script src="../static/js/admin_dashboard.js" defer></script>
 </head>
 <body>
-
+<h1>Dashboard</h1>
+    <div id="my-qr-reader"></div>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <button id="show-scanner-button" onclick="showScanner()">Scan ticket</button>
+    <button id="hide-scanner-button" onclick="hideScanner()">Stop scanning</button>
 </body>
 </html>
