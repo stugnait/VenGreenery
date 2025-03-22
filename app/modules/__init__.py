@@ -1,0 +1,1 @@
+﻿from .WayForPay import WayForPay
