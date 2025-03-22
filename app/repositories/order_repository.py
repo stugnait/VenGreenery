@@ -19,8 +19,8 @@ class OrderRepository:
         return Order.query.filter_by(phone=phone).first()
 
     @staticmethod
-    def create(full_name, email, phone, payment, status):
-        new_order = Order(full_name=full_name, email=email, phone=phone, payment=payment,status=status)
+    def create(name, surname, email, phone, status) -> Order:
+        new_order = Order(name=name, surname=surname, email=email, phone=phone,status=status)
         db.session.add(new_order)
         db.session.commit()
         return new_order

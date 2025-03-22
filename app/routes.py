@@ -1,4 +1,5 @@
 import hashlib
+import os
 
 from flask import Blueprint, render_template, request, jsonify, session
 from flask_mail import Message
@@ -8,10 +9,22 @@ from app.controllers import *
 
 routes = Blueprint('routes', __name__)
 
-@routes.route('/')
+@routes.route('/order')
 def do_order():
     return render_template("order.html")
 
+@routes.route('/order', methods=['POST'])
+def do_order_post():
+    try:
+        name = request.json.get("name")
+        surname = request.json.get("surname")
+        email = request.json.get("email")
+        phone = request.json.get("phone")
+        ticket_type = request.json.get("ticket_type")
+        invoice = OrderController.create_order(name, surname, email, phone, ticket_type).get("invoiceUrl")
+        return jsonify(invoice)
+    except KeyError as e:
+        return jsonify({"error": f"No {e} parameter"})
 
 @routes.route('/admin_auth')
 def admin_auth():

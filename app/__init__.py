@@ -13,6 +13,10 @@ def create_app():
     db.init_app(app)
     mail.init_app(app)
 
+    from app.models.user import User
+    from app.models.payment import Payment
+    from app.models.order import Order
+    from app.models.ticket import Ticket
     migrate = Migrate(app, db)
 
     return app

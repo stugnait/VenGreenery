@@ -2,8 +2,8 @@ from app.repositories import OrderRepository
 
 class OrderService:
     @staticmethod
-    def create_order(full_name, email, phone, payment):
-        return OrderRepository.create(full_name, email, phone, payment, "Waiting")
+    def create_order(name, surname, email, phone):
+        return OrderRepository.create(name, surname, email, phone, "Waiting")
 
     @staticmethod
     def get_order(order_id):

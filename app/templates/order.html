@@ -9,11 +9,11 @@
     <form id="input-form" method="POST" action="/payment" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <label>
             <span>Дорослий квиток: </span>
-            <input name="adult-quantity" type="number" placeholder="Enter a number" min="0" value="0">
+            <input name="adult-quantity" id="adult-quantity" type="number" placeholder="Enter a number" min="0" value="0">
         </label>
         <label>
             <span>Дитячий квиток: </span>
-            <input name="child-quantity" type="number" placeholder="Enter a number"  min="0" value="0">
+            <input name="child-quantity" id="child-quantity" type="number" placeholder="Enter a number"  min="0" value="0">
         </label>
         <label>
             Прізвище:
@@ -26,14 +26,15 @@
         <label>
             <span>Ваша пошта:</span>
             <input name="user-email" id="user-email" type="email" placeholder="Введіть пошту">
-            <span id="invalid-input"></span>
         </label>
         <label>
             <span>Ваш номер телефону:</span>
             <input name="user-phone" id="user-phone" type="tel" placeholder="Введіть номер телефону">
         </label>
-    <button type="submit">Придбати</button>
-    <button type="reset">Скинути</button>
+        <span id="invalid-input"></span>
+
+        <button type="submit">Придбати</button>
+        <button type="reset">Скинути</button>
     </form>
 </body>
 </html>
