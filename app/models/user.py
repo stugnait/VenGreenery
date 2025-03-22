@@ -10,8 +10,8 @@ class User(db.Model):
     phone = db.Column(db.String, nullable=False)
 
     def __init__(self, name, password, email, phone):
-        self.__name = name
-        self.__password = password
-        self.__email = email
-        self.__phone = phone
+        self.name = name
+        self.password = password
+        self.email = email
+        self.phone = phone
 
