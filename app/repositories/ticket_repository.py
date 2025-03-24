@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app.models import Ticket
 from app import db
 
@@ -11,8 +13,9 @@ class TicketRepository:
         return Ticket.query.all()
 
     @staticmethod
-    def create(ticket_type, used, create_date, use_date, order, who_scanned):
-        new_ticket = Ticket(ticket_type=ticket_type, used=used, create_date=create_date, use_date=use_date, order=order, who_scanned=who_scanned)
+    def create(ticket_type, order):
+        now = datetime.now()
+        new_ticket = Ticket(ticket_type=ticket_type, used=False, create_date=now, use_date=None, order=order, who_scanned=None)
         db.session.add(new_ticket)
         db.session.commit()
         return new_ticket

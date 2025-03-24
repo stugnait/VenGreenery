@@ -28,7 +28,6 @@
     }
     else {
         hint.style.display = 'none';
-        console.log("GONNA FETCH")
         fetch("/order", {
             method: 'POST',
             headers: {
@@ -39,7 +38,7 @@
                 surname: userSurnameValue,
                 email: emailValue,
                 phone: phoneValue,
-                ticket_type: adultQuantityValue === 1 ? "adult" : "child"
+                ticket_type: adultQuantityValue === "1" ? "adult" : "child"
             })
         })
         .then(res => res.json())

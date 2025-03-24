@@ -45,7 +45,8 @@ class WayForPay:
                 "merchantDomainName": self.domain,
                 "transactionType": "CREATE_INVOICE",
                 "apiVersion": "1",
-                "language": "ua"
+                "language": "ua",
+                "notifyMethod": "email"
             }
             body.update(data)
             headers = {"Content-Type": "application/json"}

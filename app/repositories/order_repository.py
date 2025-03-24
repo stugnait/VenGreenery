@@ -3,19 +3,19 @@ from app import db
 
 class OrderRepository:
     @staticmethod
-    def get_by_id(order_id):
+    def get_by_id(order_id) -> Order:
         return Order.query.get(order_id)
 
     @staticmethod
-    def get_all():
+    def get_all() -> Order:
         return Order.query.all()
 
     @staticmethod
-    def get_by_email(email):
+    def get_by_email(email) -> Order:
         return Order.query.filter_by(email=email).first()
 
     @staticmethod
-    def get_by_phone(phone):
+    def get_by_phone(phone) -> Order:
         return Order.query.filter_by(phone=phone).first()
 
     @staticmethod

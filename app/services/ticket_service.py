@@ -11,5 +11,5 @@ class TicketService:
         return TicketRepository.get_all()
 
     @staticmethod
-    def create_ticket(ticket_type, create_date, order):
-        return TicketRepository.create(ticket_type, False, create_date, None, order, None)
+    def create_ticket(ticket_type, order_id):
+        return TicketRepository.create(ticket_type, order_id)
