@@ -33,7 +33,7 @@ domReady(function () {
             else {
                 console.log("Error!!!" + data);
             }
-        })
+        })  
         .catch(err => console.log(err));
     }
 

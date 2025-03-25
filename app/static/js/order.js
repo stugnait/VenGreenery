@@ -1,33 +1,29 @@
-﻿document.getElementById('input-form').addEventListener('submit', event => {
+﻿$(document).ready(function(){
+  $("#phone").mask("+38 (999) 999 99 99");
+});
+
+document.getElementById('input-form').addEventListener('submit', event => {
     event.preventDefault();
 
-    const emailValue = document.getElementById('user-email').value;
-    const phoneValue = document.getElementById('user-phone').value;
-    const adultQuantityValue = document.getElementById('adult-quantity').value;
-    const childQuantityValue = document.getElementById('child-quantity').value;
-    const userSurnameValue = document.getElementById('user-surname').value;
-    const userNameValue = document.getElementById('user-name').value;
-
-    let hint = document.getElementById('invalid-input');
+    const emailValue = document.getElementById('email').value;
+    const phoneValue = document.getElementById('phone').value;
+    const ticketType = document.querySelector('input[name="ticket_type"]:checked');
+    const userSurnameValue = document.getElementById('surname').value;
+    const userNameValue = document.getElementById('name').value;
 
     if (!validateEmail(emailValue)) {
-        hint.style.display = 'block';
-        hint.textContent = "Неправильно введена пошта";
+        alert("Неправильно введена пошта");
     }
     else if (!validatePhone(phoneValue)) {
-        hint.style.display = 'block';
-        hint.textContent = "Неправильно введений номер телефону"
+        alert("Неправильно введений номер телефону")
     }
-    else if (!validateQuantity(adultQuantityValue, childQuantityValue)) {
-        hint.style.display = 'block';
-        hint.textContent = "Лише один квиток"
+    else if (!ticketType) {
+        alert("Лише один квиток")
     }
     else if (!validateFullName(userNameValue, userSurnameValue)) {
-        hint.style.display = 'block';
-        hint.textContent = "Заповніть поле імені та прізвища"
+        alert("Заповніть поле імені та прізвища")
     }
     else {
-        hint.style.display = 'none';
         fetch("/order", {
             method: 'POST',
             headers: {
@@ -38,7 +34,7 @@
                 surname: userSurnameValue,
                 email: emailValue,
                 phone: phoneValue,
-                ticket_type: adultQuantityValue === "1" ? "adult" : "child"
+                ticket_type: ticketType.value,
             })
         })
         .then(res => res.json())
@@ -46,11 +42,7 @@
             window.location.href = data;
         })
         .catch(err => console.log(err));
-
-
     }
-
-
 })
 
 function validateEmail(email) {
@@ -58,12 +50,8 @@ function validateEmail(email) {
     return emailPattern.test(email);
 }
 function validatePhone(phone) {
-    const phonePattern = /^\+?[1-9]\d{1,2}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
+    const phonePattern = /^\+?\d{1,3}[\s\-]?\(?\d{2,3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/;
     return phonePattern.test(phone);
-}
-
-function validateQuantity(adult, child) {
-    return (adult === "1" && child === "0") || (adult === "0" && child === "1");
 }
 
 function validateFullName(name, surname) {
