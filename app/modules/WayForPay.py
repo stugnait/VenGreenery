@@ -11,6 +11,20 @@ class WayForPay:
         self.key = key
         self.domain = domain
 
+    @staticmethod
+    def get_answer_signature(merchant_key, data):
+        order_reference = data["orderReference"]
+        status = data["status"]
+        time = data["time"]
+
+        signature_text = (
+            f"{order_reference};"
+            f"{status};"
+            f"{time}"
+        )
+        signature = hmac.new(merchant_key.encode("utf-8"), signature_text.encode("utf-8"), hashlib.md5).hexdigest()
+        return signature
+
     def get_signature(self, data):
         order_reference = data['orderReference']
         order_date = data['orderDate']

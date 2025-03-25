@@ -9,6 +9,10 @@ class TicketRepository:
         return Ticket.query.get(ticket_id)
 
     @staticmethod
+    def get_ticket_by_order_id(order_id):
+        return Ticket.query.filter_by(order=order_id).first()
+
+    @staticmethod
     def get_all():
         return Ticket.query.all()
 

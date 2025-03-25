@@ -16,6 +16,7 @@ class PaymentService:
         invoice = wfp.create_invoice({
             "orderReference": f"test_{order_id}_test_testing",
             "orderDate": int(now.timestamp()),
+            "orderTimeout": 900, #15 хв на оплату
             "amount": price,
             "currency": "UAH",
             "productName": [ticket_type],
@@ -24,7 +25,9 @@ class PaymentService:
             "clientFirstName": name,
             "clientLastName": surname,
             "clientEmail": email,
-            "clientPhone": phone
+            "clientPhone": phone,
+            "serviceUrl": os.getenv("MERCHANT_DOMAIN"),
+            "returnUrl": f"{os.getenv("MERCHANT_DOMAIN")}ticket/{order_id}/{email}"
         })
         PaymentRepository.create(price, ticket_type, now, order_id, "Waiting")
         return invoice

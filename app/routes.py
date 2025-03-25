@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+from datetime import datetime
 from io import BytesIO
 
 from flask import Blueprint, render_template, request, jsonify, session
@@ -16,10 +17,17 @@ import qrcode
 from reportlab.pdfgen import canvas
 from reportlab.rl_config import defaultPageSize
 
+from app.modules import WayForPay
+
 routes = Blueprint('routes', __name__)
 
 @routes.route('/')
 def index():
+    if request:
+        print(f"Method: {request.method}")
+        print(f"Values: {request.values}")
+        print(f"Data: {request.data}")
+        print(f"Request: {request}")
     return render_template('index.html')
 
 
@@ -43,6 +51,8 @@ def do_order_post():
 
 @routes.route('/admin_auth')
 def admin_auth():
+    if AuthService.check_session(session):
+        return render_template("admin_dashboard.html")
     return render_template("admin_auth.html")
 
 @routes.route('/verify_qr', methods=['POST'])
@@ -120,7 +130,49 @@ def admin_dashboard():
     return "Хто може дати/продати цибулю?"
 
 
+@routes.route("/accept_payment", methods=['POST'])
+def accept_payment():
+    try:
+        print(f"ACCEPTING PAYMENT:\nREQUEST: {request.json}")
+        if request.json.get("reason") == "1100":
+            print(f"    GOOD REASON (1100):\n{request.json}")
 
+            wfp_order_id = request.json.get("orderReference") # умовно WFP ордер айді буде у форматі ticket_{order_id}
+            order_id = wfp_order_id.split("_")[1]             # поки для тесту юзаю test_{order_id}_test_testing
+                                                              # такий спліт, в принципі, задовільний і продівський формат
+            order = OrderController.get_order(order_id)
+            payment = PaymentController.get_payment_by_order_id(order_id)
+
+            ticket = TicketController.create_ticket(payment.ticket_type, order_id)
+            data = {
+                "id": ticket.id,
+                "name": order.name,
+                "surname": order.surname,
+                "email": order.email,
+                "phone": order.phone
+            }
+
+            pdf_buffer = generate_pdf(data)
+
+            payment.status = "Success"
+            db.session.commit()
+
+            msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
+            msg.body = "Дякуємо за покупку!"
+            msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
+            mail.send(msg)
+
+            answer = {
+                "orderReference": wfp_order_id,
+                "status": "accept",
+                "time":datetime.now().timestamp(),
+            }
+            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_KEY"), answer)
+            return jsonify(answer), 200
+        else:
+            print(f"    BAD REASON ({request.json.get('reason')}):\n{request.json}")
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 ###testing features
@@ -133,44 +185,95 @@ def test_qr():
     ticket = TicketController.create_ticket(payment.ticket_type, order.id)
 
     data = {"id": ticket.id, "name": order.name, "surname": order.surname, "email": order.email, "phone": order.phone}
+
+    pdf_buffer = generate_pdf(data)
+
+
+    payment.status = "Success"
+    order.status = "Success"
+    db.session.commit()
+
+
+    try:
+        msg = Message('Ваш квиток до Ven Greenery', recipients=['nikitaz9251015@gmail.com'])
+        msg.body = "Дякуємо за покупку!"
+        msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
+        mail.send(msg)
+
+
+        return "Email sent successfully!"
+    except Exception as e:
+        return f"Error sending email: {str(e)}"
+
+
+
+def generate_pdf(data):
     json_data = json.dumps(data, separators=(",", ":"))
 
     img = qrcode.make(json_data)
-    img_path = f"app/static/qr/qr_{ticket.id}.png"
+    img_path = f"app/static/qr/ticket_{data['id']}.png"
     img.save(img_path)
 
-    pdf_path = f"app/static/pdf/pdf_{ticket.id}.pdf"
+    pdf_path = f"app/static/pdf/ticket_{data['id']}.pdf"
     pdf_buffer = BytesIO()
     can = canvas.Canvas(pdf_buffer)
     pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))
+    pdfmetrics.registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
 
     width = defaultPageSize[0]
     height = defaultPageSize[1]
 
-    text = "Чек"
-    text_width = stringWidth(text, "Arial", 12)
+    text = f"Квиток №{data['id']}"
+    text_width = stringWidth(text, "Arial-Bold", 20)
+
+    can.setFont("Arial-Bold", 20)
+    headline = PDFTextObject(can, (width - text_width) / 2.0, height - 80.0)
+    headline.textLine(text)
+    can.drawText(headline)
+
+    text = [
+        "Дякуємо за вашу покупку!",
+        "",
+        "",
+        "Ви успішно придбали квиток. Будь ласка, збережіть цей документ та пред’явіть",
+        "його на вході.",
+        "",
+        "",
+        f"    Номер квитка: №{data['id']}",
+        f"    Місце проведення: вулиця Шевченка, Мамаївці, Чернівецька область",
+        "",
+        "",
+        "Умови використання:",
+        "    • Цей квиток є одноразовим та дійсний лише для одного входу.",
+        "    • Доступ можливий тільки за цим QR-кодом.",
+        "",
+        "",
+        "Бажаємо вам гарного відпочинку!"
+    ]
 
     can.setFont("Arial", 12)
-    hui = PDFTextObject(can, (width-text_width)/2.0, height-20.0, "LTR")
-    hui.textLines([text, text, text, text, text, text, text, text])
-    can.drawText(hui)
-    can.drawImage(img_path, (width-300)/2, 0, width=300, preserveAspectRatio=True, mask='auto')
+    main_text = PDFTextObject(can, 100.0, height - 140.0, "LTR")
+    main_text.textLines(text)
+    can.drawText(main_text)
+
+    can.drawImage(img_path, (width - 350) / 2, 0, width=350, preserveAspectRatio=True, mask='auto')
 
     can.showPage()
     can.save()
     pdf_buffer.seek(0)
 
+    with open(pdf_path, "wb") as f:
+        f.write(pdf_buffer.getvalue())
+
+    return pdf_buffer
 
 
-    payment.status = "Success"
-    db.session.commit()
+@routes.route("/order_status/<int:order_id>/<string:email>")
+def thanks(order_id, email):
 
-
-    try:
-        msg = Message('Test Email', recipients=['nikitaz9251015@gmail.com'])
-        msg.body = "I'm testing email!"
-        msg.attach(pdf_path, "application/pdf", pdf_buffer.read())
-        mail.send(msg)
-        return "Email sent successfully!"
-    except Exception as e:
-        return f"Error sending email: {str(e)}"
+    order = OrderController.get_order(order_id)
+    if order.email == email:
+        ticket = TicketController.get_ticket_by_order_id(order_id)
+        print(ticket.id)
+        return render_template('thanks.html', filename=f"pdf/ticket_{ticket.id}.pdf")
+    return "Incorrect credentials."
