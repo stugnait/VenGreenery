@@ -3,39 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <title>VenGreenery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+            rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script src="../static/js/order.js" defer></script>
-    <link rel="icon" href="../static/img/temp_logo_64.svg">
+    <link rel="stylesheet" href="../static/css/order.css">
+    <link rel="icon" href="../static/img/b&w_logo.svg">
 </head>
 <body>
-    <form id="input-form" method="POST" action="/payment" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <label>
-            <span>Дорослий квиток: </span>
-            <input name="adult-quantity" id="adult-quantity" type="number" placeholder="Enter a number" min="0" value="0">
-        </label>
-        <label>
-            <span>Дитячий квиток: </span>
-            <input name="child-quantity" id="child-quantity" type="number" placeholder="Enter a number"  min="0" value="0">
-        </label>
-        <label>
-            Прізвище:
-            <input name="user-surname" id="user-surname" type="text" placeholder="Прізвище">
-        </label>
-        <label>
-            Ім'я:
-            <input name="user-name" id="user-name" type="text" placeholder="Ім'я">
-        </label>
-        <label>
-            <span>Ваша пошта:</span>
-            <input name="user-email" id="user-email" type="email" placeholder="Введіть пошту">
-        </label>
-        <label>
-            <span>Ваш номер телефону:</span>
-            <input name="user-phone" id="user-phone" type="tel" placeholder="Введіть номер телефону">
-        </label>
-        <span id="invalid-input"></span>
+    <header>
+        <img src="../static/img/logo_red_fixed.png" alt="VenGreenery">
+    </header>
 
-        <button type="submit">Придбати</button>
-        <button type="reset">Скинути</button>
+<div class="container">
+    <form id="input-form" method="POST" action="#">
+        <div class="form-group radio-tabs">
+            <input type="radio" id="adult" name="ticket_type" value="adult" checked>
+            <label for="adult" class="tab-label">Дорослий</label>
+
+            <input type="radio" id="child" name="ticket_type" value="child">
+            <label for="child" class="tab-label">Дитячий</label>
+        </div>
+
+        <div class="form-group">
+            <label for="surname">Прізвище:</label>
+            <input type="text" id="surname" name="surname" required>
+        </div>
+        <div class="form-group">
+            <label for="name">Ім'я:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Пошта:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Номер телефону:</label>
+            <input type="tel" id="phone" name="phone" pattern="^\+?\d{1,3}[\s\-]?\(?\d{2,3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$" required>
+        </div>
+
+        <div class="button-container">
+            <button type="reset">Очистити</button>
+            <button type="submit">Відправити</button>
+        </div>
     </form>
+</div>
+
+<div class="notes-container">
+    <h1>ℹ️ Примітки</h1>
+    <ul>
+        <h3>Безплатний вхід</h3>
+        <li>Дітям до 6 років</li>
+        <li>Дітям з інвалідністю до 18 років</li>
+        <li>Дітям Військовослужбовців УБД до 12 років</li>
+    </ul>
+    <ul>
+        <h3>Пільговий квиток</h3>
+        <li>Пенсійне посвідчення – 150 грн</li>
+        <li>Військовослужбовці УБД – 100 грн</li>
+    </ul>
+    <ul class="hints-list">
+        <h3>Зауважте!</h3>
+        <li class="hint-item">* Пільгові квитки продаються тільки за умови надання відповідних документів</li>
+        <li class="hint-item">* Пільговий квиток продається тільки в касах парку</li>
+        <li class="hint-item">* Вхід на територію парку - разовий</li>
+    </ul>
+</div>
 </body>
 </html>
