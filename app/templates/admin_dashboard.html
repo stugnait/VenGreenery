@@ -5,15 +5,25 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Dashboard</title>
+    <title>Ven Greenery - Scan QR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
     <script src="../static/js/admin_dashboard.js" defer></script>
-    <link rel="icon" href="../static/img/temp_logo_64.svg">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="../static/css/admin_dashboard.css">
 </head>
 <body>
-<h1>Dashboard</h1>
+<header>
+    <img src="../static/img/logo_white_fixed.png" alt="Ven Greenery">
+</header>
+
+<div class="container">
     <div id="my-qr-reader"></div>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <button id="show-scanner-button" onclick="showScanner()">Scan ticket</button>
-    <button id="hide-scanner-button" onclick="hideScanner()">Stop scanning</button>
+</div>
+
+<div id="notification"></div>
 </body>
 </html>

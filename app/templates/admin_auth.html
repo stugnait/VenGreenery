@@ -6,22 +6,34 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Авторизація</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/admin_auth.css">
     <script src="../static/js/admin_auth.js" defer></script>
     <link rel="icon" href="../static/img/temp_logo_64.svg">
 </head>
 <body>
-    <form id="auth-from" method="GET" action="/admin_dashboard" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <label>
-            <span>Пошта або номер телефону:</span>
-            <input name="admin-credentials" id="admin-credentials" type="text" placeholder="Пошта або номер телефону">
-            <span id="invalid-input"></span>
-        </label>
-        <label>
-            <span>Пароль:</span>
-            <input name="admin-password" id="admin-password" type="password" placeholder="Пароль">
-        </label>
-    <button type="submit">Увійти</button>
-    <button type="reset">Скинути</button>
+<header>
+    <img src="../static/img/logo_red_fixed.png" alt="Logo">
+</header>
+
+<div class="container">
+    <h1>Вхід</h1>
+    <form id="auth-from" method="GET" action="/admin_dashboard">
+        <div class="form-group">
+            <label for="admin-credentials">Емейл або телефон:</label>
+            <input type="text" id="admin-credentials" name="admin-credentials" placeholder="Пошта або номер телефону" required>
+        </div>
+        <div class="form-group">
+            <label for="admin-password">Пароль:</label>
+            <input type="password" id="admin-password" name="admin-password" placeholder="Пароль" required>
+        </div>
+        <span id="invalid-input"></span>
+        <button type="submit">Увійти</button>
     </form>
+</div>
 </body>
 </html>
