@@ -26,8 +26,8 @@ class PaymentService:
             "clientLastName": surname,
             "clientEmail": email,
             "clientPhone": phone,
-            "serviceUrl": os.getenv("MERCHANT_DOMAIN"),
-            "returnUrl": f"http://127.0.0.1:5000/order_status/{order_id}/{email}" # {os.getenv("MERCHANT_DOMAIN")}
+            "serviceUrl": f"{os.getenv("MERCHANT_DOMAIN")}accept_payment",
+            "returnUrl": f"{os.getenv("MERCHANT_DOMAIN")}order_status/{order_id}/{email}"
         })
 
 

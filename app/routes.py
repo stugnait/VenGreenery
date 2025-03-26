@@ -21,7 +21,8 @@ from app.modules import WayForPay
 
 routes = Blueprint('routes', __name__)
 
-@routes.route('/')
+
+@routes.route('/', methods=['GET', 'POST'])
 def index():
     if request:
         print(f"Method: {request.method}")
@@ -31,10 +32,10 @@ def index():
     return render_template('index.html')
 
 
-
 @routes.route('/order')
 def do_order():
     return render_template("order.html")
+
 
 @routes.route('/order', methods=['POST'])
 def do_order_post():
@@ -49,42 +50,54 @@ def do_order_post():
     except KeyError as e:
         return jsonify({"error": f"No {e} parameter"})
 
+
 @routes.route('/admin_auth')
 def admin_auth():
     if AuthService.check_session(session):
         return render_template("admin_dashboard.html")
     return render_template("admin_auth.html")
 
+
 @routes.route('/verify_qr', methods=['POST'])
 def verify_qr():
     try:
+        user = None
+        if "email" in session:
+            user = AdminController.get_user_by_email(session["email"])
+        elif "phone" in session:
+            user = AdminController.get_user_by_phone(session["phone"])
+        else:
+            return jsonify({"error": "No user found"})
+
         qr_data = request.json.get('qr_data')
         qr_dict = json.loads(qr_data)
 
-        name=qr_dict.get("name")
-        surname=qr_dict.get("surname")
-        email=qr_dict.get("email")
-        phone=qr_dict.get("phone")
+        name = qr_dict.get("name")
+        surname = qr_dict.get("surname")
+        email = qr_dict.get("email")
+        phone = qr_dict.get("phone")
 
-        print(qr_dict)
         if not qr_data:
-            return jsonify({"error":"QR code not detected."}), 400
+            return jsonify({"error": "QR code not detected."}), 400
 
         ticket = TicketController.get_ticket(qr_dict["id"])
         order = OrderController.get_order(ticket.order)
-        print(f"name: {name} surname: {surname} email: {email} phone: {phone}")
-        print(f"name: {order.name} surname: {order.surname} email: {order.email} phone: {order.phone}")
         if ticket:
             if ticket.used:
-                return jsonify({"error":"Ticket already used."}), 400
-            if name==order.name and surname==order.surname and email==order.email and phone==order.phone:
+                return jsonify({"error": "Ticket already used."}), 400
+            if name == order.name and surname == order.surname and email == order.email and phone == order.phone:
+                ticket.use_date = datetime.now()
+                ticket.used = True
+                ticket.who_scanned = user.id
+                db.session.commit()
                 return jsonify({"success": "ok"}), 200
-            return jsonify({"error":"Ticket data isn't equal to QR code data."}), 400
+            return jsonify({"error": "Ticket data isn't equal to QR code data."}), 400
         else:
-            return jsonify({"error":"Ticket not found."}), 404
+            return jsonify({"error": "Ticket not found."}), 404
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @routes.route("/find_user", methods=['POST'])
 def find_user():
@@ -101,6 +114,7 @@ def find_user():
         return jsonify({"error": "Invalid credentials."}), 401
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @routes.route("/login", methods=['POST'])
 def login():
@@ -123,103 +137,17 @@ def login():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @routes.route("/admin_dashboard", methods=['GET'])
 def admin_dashboard():
-    if AuthService.check_session(session):
+    if AuthController.check_session(session):
         return render_template("admin_dashboard.html")
-    return "Хто може дати/продати цибулю?"
-
-
-@routes.route("/accept_payment", methods=['POST'])
-def accept_payment():
-    try:
-        print(f"ACCEPTING PAYMENT:\nREQUEST: {request.json}")
-        if request.json.get("reason") == "1100":
-            print(f"    GOOD REASON (1100):\n{request.json}")
-
-            wfp_order_id = request.json.get("orderReference") # умовно WFP ордер айді буде у форматі ticket_{order_id}
-            order_id = wfp_order_id.split("_")[1]             # поки для тесту юзаю test_{order_id}_test_testing
-                                                              # такий спліт, в принципі, задовільний і продівський формат
-            order = OrderController.get_order(order_id)
-            payment = PaymentController.get_payment_by_order_id(order_id)
-
-            ticket = TicketController.create_ticket(payment.ticket_type, order_id)
-            data = {
-                "id": ticket.id,
-                "name": order.name,
-                "surname": order.surname,
-                "email": order.email,
-                "phone": order.phone
-            }
-
-            pdf_buffer = generate_pdf(data)
-
-            payment.status = "Success"
-            order.status = "Success"
-            db.session.commit()
-
-            msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
-            msg.body = "Дякуємо за покупку!"
-            msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
-            mail.send(msg)
-
-            answer = {
-                "orderReference": wfp_order_id,
-                "status": "accept",
-                "time":datetime.now().timestamp(),
-            }
-            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_KEY"), answer)
-
-            try:
-                msg = Message('Ваш квиток до Ven Greenery', recipients=['nikitaz9251015@gmail.com'])
-                msg.body = "Дякуємо за покупку!"
-                msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
-                mail.send(msg)
-
-                return "Email sent successfully!"
-            except Exception as e:
-                return f"Error sending email: {str(e)}"
-
-            return jsonify(answer), 200
-        else:
-            print(f"    BAD REASON ({request.json.get('reason')}):\n{request.json}")
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-###testing features
-@routes.route('/test_qr', methods=['GET'])
-def test_qr():
-    payment_id = 1
-    payment = PaymentController.get_payment(payment_id)
-    order = OrderController.get_order(payment.order)
-
-    ticket = TicketController.create_ticket(payment.ticket_type, order.id)
-
-    data = {"id": ticket.id, "name": order.name, "surname": order.surname, "email": order.email, "phone": order.phone}
-
-    pdf_buffer = generate_pdf(data)
-
-
-    payment.status = "Success"
-    order.status = "Success"
-    db.session.commit()
-
-
-    try:
-        msg = Message('Ваш квиток до Ven Greenery', recipients=['nikitaz9251015@gmail.com'])
-        msg.body = "Дякуємо за покупку!"
-        msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
-        mail.send(msg)
-
-
-        return "Email sent successfully!"
-    except Exception as e:
-        return f"Error sending email: {str(e)}"
-
+    return render_template("admin_auth.html")
 
 
 def generate_pdf(data):
+    current_directory = os.getcwd()
+
     json_data = json.dumps(data, separators=(",", ":"))
 
     img = qrcode.make(json_data)
@@ -229,8 +157,8 @@ def generate_pdf(data):
     pdf_path = f"app/static/pdf/ticket_{data['id']}.pdf"
     pdf_buffer = BytesIO()
     can = canvas.Canvas(pdf_buffer)
-    pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))
-    pdfmetrics.registerFont(TTFont('Arial-Bold', 'arialbd.ttf'))
+    pdfmetrics.registerFont(TTFont('Arial', 'app/static/fonts/Arial.ttf'))
+    pdfmetrics.registerFont(TTFont('Arial-Bold', 'app/static/fonts/Arial_Bold.ttf'))
 
     width = defaultPageSize[0]
     height = defaultPageSize[1]
@@ -280,30 +208,68 @@ def generate_pdf(data):
     return pdf_buffer
 
 
+@routes.route("/accept_payment", methods=['POST'])
+def accept_payment():
+    try:
+        raw_data = next(iter(request.values.keys()), '{}')
+        data = json.loads(raw_data)
+        if data["reasonCode"] == 1100:
+            wfp_order_id = data["orderReference"]
+            order_id = wfp_order_id.split("_")[1]
+            order = OrderController.get_order(order_id)
+            payment = PaymentController.get_payment_by_order_id(order_id)
+
+            ticket = TicketController.create_ticket(payment.ticket_type, order_id)
+
+            data = {
+                "id": ticket.id,
+                "name": order.name,
+                "surname": order.surname,
+                "email": order.email,
+                "phone": order.phone
+            }
+
+            pdf_buffer = generate_pdf(data)
+
+            payment.status = "Success"
+            order.status = "Success"
+            db.session.commit()
+
+            msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
+            msg.body = "Дякуємо за покупку!"
+            msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
+            mail.send(msg)
+
+            answer = {
+                "orderReference": wfp_order_id,
+                "status": "accept",
+                "time": datetime.now().timestamp(),
+            }
+            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
+
+            msg = Message('Ваш квиток до Ven Greenery', recipients=['nikitaz9251015@gmail.com'])
+            msg.body = "Дякуємо за покупку!"
+            msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
+            mail.send(msg)
+
+            return jsonify(answer), 200
+        else:
+            answer = {
+                "orderReference": data["orderReference"],
+                "status": "accept",
+                "time": datetime.now().timestamp(),
+            }
+            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
+
+            return jsonify(answer), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @routes.route("/order_status/<int:order_id>/<string:email>", methods=["POST"])
 def thanks(order_id, email):
-
-    # for dev test
-
     order = OrderController.get_order(order_id)
     payment = PaymentController.get_payment_by_order_id(order.id)
-
-    # тікет уже буде згенерований після того як Way For Pay стукне в ендпоінт про оплату
-    ticket = TicketController.create_ticket(payment.ticket_type, order.id)
-
-    # на проді треба буде прибрати, бо пдфка уже буде створена
-    data = {"id": ticket.id, "name": order.name, "surname": order.surname, "email": order.email, "phone": order.phone}
-    pdf_buffer = generate_pdf(data)
-
-
-    # це теж треба буде прибрати, коли будемо ставити на прод
-    msg = Message('Ваш квиток до Ven Greenery', recipients=['nikitaz9251015@gmail.com'])
-    msg.body = "Дякуємо за покупку!"
-    msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
-    mail.send(msg)
-    
-
-    # # #
 
     if order.email == email:
         ticket = TicketController.get_ticket_by_order_id(order_id)

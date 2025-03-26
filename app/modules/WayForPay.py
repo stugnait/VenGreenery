@@ -49,8 +49,6 @@ class WayForPay:
         return signature
 
 
-    #serviceUrl - URL, на який система повинна відправляти повідомлення з результатом оплати інвойсу безпосередньо мерчанту
-    #При тесті з норм сайтом треба буде чекнути що там прилітає
     def create_invoice(self, data):
         try:
             body = {
