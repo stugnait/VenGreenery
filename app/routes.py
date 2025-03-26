@@ -268,10 +268,21 @@ def generate_pdf(data):
     return pdf_buffer
 
 
-@routes.route("/order_status/<int:order_id>/<string:email>")
+@routes.route("/order_status/<int:order_id>/<string:email>", methods=["POST"])
 def thanks(order_id, email):
 
+    # for dev test
+
+    print(f"ACCEPTING PAYMENT:\nREQUEST: {request}")
     order = OrderController.get_order(order_id)
+    payment = PaymentController.get_payment_by_order_id(order.id)
+    ticket = TicketController.create_ticket(payment.ticket_type, order.id)
+
+    data = {"id": ticket.id, "name": order.name, "surname": order.surname, "email": order.email, "phone": order.phone}
+    pdf_buffer = generate_pdf(data)
+
+    # # #
+
     if order.email == email:
         ticket = TicketController.get_ticket_by_order_id(order_id)
         print(ticket.id)
