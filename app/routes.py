@@ -217,28 +217,29 @@ def accept_payment():
             wfp_order_id = data["orderReference"]
             order_id = wfp_order_id.split("_")[1]
             order = OrderController.get_order(order_id)
-            payment = PaymentController.get_payment_by_order_id(order_id)
+            if not TicketController.get_ticket_by_order_id(order.id):
+                payment = PaymentController.get_payment_by_order_id(order_id)
 
-            ticket = TicketController.create_ticket(payment.ticket_type, order_id)
+                ticket = TicketController.create_ticket(payment.ticket_type, order_id)
 
-            data = {
-                "id": ticket.id,
-                "name": order.name,
-                "surname": order.surname,
-                "email": order.email,
-                "phone": order.phone
-            }
+                data = {
+                    "id": ticket.id,
+                    "name": order.name,
+                    "surname": order.surname,
+                    "email": order.email,
+                    "phone": order.phone
+                }
 
-            pdf_buffer = generate_pdf(data)
+                pdf_buffer = generate_pdf(data)
 
-            payment.status = "Success"
-            order.status = "Success"
-            db.session.commit()
+                payment.status = "Success"
+                order.status = "Success"
+                db.session.commit()
 
-            msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
-            msg.body = "Дякуємо за покупку!"
-            msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
-            mail.send(msg)
+                msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
+                msg.body = "Дякуємо за покупку!"
+                msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
+                mail.send(msg)
 
             answer = {
                 "orderReference": wfp_order_id,
@@ -246,11 +247,6 @@ def accept_payment():
                 "time": datetime.now().timestamp(),
             }
             answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
-
-            msg = Message('Ваш квиток до Ven Greenery', recipients=['nikitaz9251015@gmail.com'])
-            msg.body = "Дякуємо за покупку!"
-            msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
-            mail.send(msg)
 
             return jsonify(answer), 200
         else:
