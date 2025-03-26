@@ -155,6 +155,7 @@ def accept_payment():
             pdf_buffer = generate_pdf(data)
 
             payment.status = "Success"
+            order.status = "Success"
             db.session.commit()
 
             msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
@@ -168,6 +169,17 @@ def accept_payment():
                 "time":datetime.now().timestamp(),
             }
             answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_KEY"), answer)
+
+            try:
+                msg = Message('Ваш квиток до Ven Greenery', recipients=['nikitaz9251015@gmail.com'])
+                msg.body = "Дякуємо за покупку!"
+                msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
+                mail.send(msg)
+
+                return "Email sent successfully!"
+            except Exception as e:
+                return f"Error sending email: {str(e)}"
+
             return jsonify(answer), 200
         else:
             print(f"    BAD REASON ({request.json.get('reason')}):\n{request.json}")
@@ -256,7 +268,7 @@ def generate_pdf(data):
     main_text.textLines(text)
     can.drawText(main_text)
 
-    can.drawImage(img_path, (width - 350) / 2, 0, width=350, preserveAspectRatio=True, mask='auto')
+    can.drawImage(img_path, (width - 300) / 2, 0, width=300, preserveAspectRatio=True, mask='auto')
 
     can.showPage()
     can.save()
@@ -273,18 +285,27 @@ def thanks(order_id, email):
 
     # for dev test
 
-    print(f"ACCEPTING PAYMENT:\nREQUEST: {request}")
     order = OrderController.get_order(order_id)
     payment = PaymentController.get_payment_by_order_id(order.id)
+
+    # тікет уже буде згенерований після того як Way For Pay стукне в ендпоінт про оплату
     ticket = TicketController.create_ticket(payment.ticket_type, order.id)
 
+    # на проді треба буде прибрати, бо пдфка уже буде створена
     data = {"id": ticket.id, "name": order.name, "surname": order.surname, "email": order.email, "phone": order.phone}
     pdf_buffer = generate_pdf(data)
+
+
+    # це теж треба буде прибрати, коли будемо ставити на прод
+    msg = Message('Ваш квиток до Ven Greenery', recipients=['nikitaz9251015@gmail.com'])
+    msg.body = "Дякуємо за покупку!"
+    msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
+    mail.send(msg)
+    
 
     # # #
 
     if order.email == email:
         ticket = TicketController.get_ticket_by_order_id(order_id)
-        print(ticket.id)
         return render_template('thanks.html', filename=f"pdf/ticket_{ticket.id}.pdf")
     return "Incorrect credentials."
