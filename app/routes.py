@@ -3,8 +3,9 @@ import json
 import os
 from datetime import datetime
 from io import BytesIO
+import logging
 
-from flask import Blueprint, render_template, request, jsonify, session
+from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 from flask_mail import Message
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.pdfmetrics import stringWidth
@@ -19,8 +20,22 @@ from reportlab.rl_config import defaultPageSize
 
 from app.modules import WayForPay
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 routes = Blueprint('routes', __name__)
 
+
+@routes.before_request
+def log_request_info():
+    logger.info(f"\nRequest: {request.method} {request.url} | IP: {request.remote_addr}")
+    if request.method == "POST":
+        logger.info(f"Request Body: {request.get_data(as_text=True)}")
+
+@routes.after_request
+def log_response_info(response):
+    logger.info(f"Response: {response.status} | Time Taken: {datetime.now()}")
+    return response
 
 @routes.route('/', methods=['GET', 'POST'])
 def index():
@@ -146,8 +161,6 @@ def admin_dashboard():
 
 
 def generate_pdf(data):
-    current_directory = os.getcwd()
-
     json_data = json.dumps(data, separators=(",", ":"))
 
     img = qrcode.make(json_data)
@@ -233,6 +246,7 @@ def accept_payment():
                 pdf_buffer = generate_pdf(data)
 
                 payment.status = "Success"
+                payment.end_date = datetime.now()
                 order.status = "Success"
                 db.session.commit()
 
@@ -262,12 +276,12 @@ def accept_payment():
         return jsonify({"error": str(e)}), 500
 
 
-@routes.route("/order_status/<int:order_id>/<string:email>", methods=["POST"])
+@routes.route("/order_status/<int:order_id>/<string:email>", methods=["GET", "POST"])
 def thanks(order_id, email):
     order = OrderController.get_order(order_id)
-    payment = PaymentController.get_payment_by_order_id(order.id)
 
     if order.email == email:
         ticket = TicketController.get_ticket_by_order_id(order_id)
-        return render_template('thanks.html', filename=f"pdf/ticket_{ticket.id}.pdf")
-    return "Incorrect credentials."
+        if ticket:
+            return render_template('thanks.html', filename=f"pdf/ticket_{ticket.id}.pdf")
+    return redirect(url_for('routes.index'))
