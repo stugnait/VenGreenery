@@ -9,8 +9,8 @@
     <link
             href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
             rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" defer></script>
     <script src="../static/js/order.js" defer></script>
     <link rel="stylesheet" href="../static/css/order.css">
     <link rel="icon" href="../static/img/b&w_logo.svg">
@@ -28,6 +28,14 @@
 
             <input type="radio" id="child" name="ticket_type" value="child">
             <label for="child" class="tab-label">Дитячий</label>
+        </div>
+        
+        <div>
+            <input id="child-quantity" name="child-quantity" type="number" min="0" value="0">
+            <label for="child-quantity">Дитячий</label>
+
+            <input id="adult-quantity" name="adult-quantity" type="number" min="0" value="0">
+            <label for="adult-quantity">Дорослий</label>
         </div>
 
         <div class="form-group">
@@ -56,19 +64,19 @@
 
 <div class="notes-container">
     <h1>ℹ️ Примітки</h1>
+    <h3>Безплатний вхід</h3>
     <ul>
-        <h3>Безплатний вхід</h3>
         <li>Дітям до 6 років</li>
         <li>Дітям з інвалідністю до 18 років</li>
         <li>Дітям Військовослужбовців УБД до 12 років</li>
     </ul>
+    <h3>Пільговий квиток</h3>
     <ul>
-        <h3>Пільговий квиток</h3>
         <li>Пенсійне посвідчення – 150 грн</li>
         <li>Військовослужбовці УБД – 100 грн</li>
     </ul>
+    <h3>Зауважте!</h3>
     <ul class="hints-list">
-        <h3>Зауважте!</h3>
         <li class="hint-item">* Пільгові квитки продаються тільки за умови надання відповідних документів</li>
         <li class="hint-item">* Пільговий квиток продається тільки в касах парку</li>
         <li class="hint-item">* Вхід на територію парку - разовий</li>

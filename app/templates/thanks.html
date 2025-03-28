@@ -24,7 +24,12 @@
     <p>Ваші квитки надіслані на вказану електронну пошту.</p>
     <p>Ви також можете завантажити їх прямо зараз:</p>
 
-    <a href="{{ url_for('static', filename=filename) }}" download class="btn">Завантажити квитки</a>
+
+    {% for ticket in tickets %}
+        <a href="{{ url_for('static', filename="pdf/ticket_"+ticket|string+".pdf") }}" download class="btn">
+            Завантажити квиток №{{ ticket }}
+        </a>
+    {% endfor %}
 </div>
 
 </body>
