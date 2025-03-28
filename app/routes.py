@@ -3,7 +3,6 @@ import json
 import os
 from datetime import datetime
 from io import BytesIO
-import logging
 
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 from flask_mail import Message
@@ -20,22 +19,7 @@ from reportlab.rl_config import defaultPageSize
 
 from app.modules import WayForPay
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 routes = Blueprint('routes', __name__)
-
-
-@routes.before_request
-def log_request_info():
-    logger.info(f"\nRequest: {request.method} {request.url} | IP: {request.remote_addr}")
-    if request.method == "POST":
-        logger.info(f"Request Body: {request.get_data(as_text=True)}")
-
-@routes.after_request
-def log_response_info(response):
-    logger.info(f"Response: {response.status} | Time Taken: {datetime.now()}")
-    return response
 
 @routes.route('/', methods=['GET', 'POST'])
 def index():
@@ -59,9 +43,10 @@ def do_order_post():
         surname = request.json.get("surname")
         email = request.json.get("email")
         phone = request.json.get("phone")
-        ticket_type = request.json.get("ticket_type")
-        invoice = OrderController.create_order(name, surname, email, phone, ticket_type).get("invoiceUrl")
-        return jsonify(invoice)
+        adult_quantity = int(request.json.get("adult_quantity"))
+        child_quantity = int(request.json.get("child_quantity"))
+        invoice = OrderController.create_order(name, surname, email, phone, adult_quantity, child_quantity)
+        return jsonify(invoice.get("invoiceUrl"))
     except KeyError as e:
         return jsonify({"error": f"No {e} parameter"})
 
@@ -160,14 +145,8 @@ def admin_dashboard():
     return render_template("admin_auth.html")
 
 
-def generate_pdf(data):
-    json_data = json.dumps(data, separators=(",", ":"))
-
-    img = qrcode.make(json_data)
-    img_path = f"app/static/qr/ticket_{data['id']}.png"
-    img.save(img_path)
-
-    pdf_path = f"app/static/pdf/ticket_{data['id']}.pdf"
+def generate_pdf(ticket_id, ticket_naming, image_path):
+    pdf_path = f"app/static/pdf/ticket_{ticket_id}.pdf"
     pdf_buffer = BytesIO()
     can = canvas.Canvas(pdf_buffer)
     pdfmetrics.registerFont(TTFont('Arial', 'app/static/fonts/Arial.ttf'))
@@ -176,7 +155,7 @@ def generate_pdf(data):
     width = defaultPageSize[0]
     height = defaultPageSize[1]
 
-    text = f"Квиток №{data['id']}"
+    text = f"Квиток №{ticket_id} ({ticket_naming})"
     text_width = stringWidth(text, "Arial-Bold", 20)
 
     can.setFont("Arial-Bold", 20)
@@ -192,14 +171,13 @@ def generate_pdf(data):
         "його на вході.",
         "",
         "",
-        f"    Номер квитка: №{data['id']}",
+        f"    Номер квитка: №{ticket_id} ({ticket_naming})",
         f"    Місце проведення: вулиця Шевченка, Мамаївці, Чернівецька область",
         "",
         "",
         "Умови використання:",
         "    • Цей квиток є одноразовим та дійсний лише для одного входу.",
         "    • Доступ можливий тільки за цим QR-кодом.",
-        "",
         "",
         "Бажаємо вам гарного відпочинку!"
     ]
@@ -209,7 +187,7 @@ def generate_pdf(data):
     main_text.textLines(text)
     can.drawText(main_text)
 
-    can.drawImage(img_path, (width - 300) / 2, 0, width=300, preserveAspectRatio=True, mask='auto')
+    can.drawImage(image_path, (width - 300) / 2, 0, width=300, preserveAspectRatio=True, mask='auto')
 
     can.showPage()
     can.save()
@@ -218,62 +196,82 @@ def generate_pdf(data):
     with open(pdf_path, "wb") as f:
         f.write(pdf_buffer.getvalue())
 
-    return pdf_buffer
+    return pdf_path
+
+def create_qr_ticket(ticket_type, order):
+    ticket = TicketController.create_ticket(ticket_type, order.id)
+    ticket_naming = 'Дорослий' if ticket_type == 'adult' else 'Дитячий'
+
+    qr_data = {
+        "id": ticket.id,
+        "name": order.name,
+        "surname": order.surname,
+        "email": order.email,
+        "phone": order.phone
+    }
+    json_data = json.dumps(qr_data, separators=(",", ":"))
+
+    img = qrcode.make(json_data)
+    img_path = f"app/static/qr/ticket_{qr_data['id']}.png"
+    img.save(img_path)
+
+    pdf_path = generate_pdf(qr_data["id"], ticket_naming, img_path)
+
+    return qr_data["id"], pdf_path, ticket_naming
 
 
 @routes.route("/accept_payment", methods=['POST'])
 def accept_payment():
-    try:
-        raw_data = next(iter(request.values.keys()), '{}')
-        data = json.loads(raw_data)
-        if data["reasonCode"] == 1100:
-            wfp_order_id = data["orderReference"]
-            order_id = wfp_order_id.split("_")[1]
-            order = OrderController.get_order(order_id)
-            if not TicketController.get_ticket_by_order_id(order.id):
-                payment = PaymentController.get_payment_by_order_id(order_id)
+    # try:
+    raw_data = next(iter(request.values.keys()), '{}')
+    data = json.loads(raw_data)
+    now = datetime.now()
+    if data["reasonCode"] == 1100:
+        wfp_order_id = data["orderReference"]
+        order_id = wfp_order_id.split("_")[1]
+        order = OrderController.get_order(order_id)
+        if not TicketController.get_ticket_by_order_id(order.id):
+            payment = PaymentController.get_payment_by_order_id(order_id)
 
-                ticket = TicketController.create_ticket(payment.ticket_type, order_id)
+            pdf_paths = []
+            for i in range(payment.adult_quantity):
+                pdf_paths.append(create_qr_ticket("adult", order))
 
-                data = {
-                    "id": ticket.id,
-                    "name": order.name,
-                    "surname": order.surname,
-                    "email": order.email,
-                    "phone": order.phone
-                }
+            for i in range(payment.child_quantity):
+                pdf_paths.append(create_qr_ticket("child", order))
 
-                pdf_buffer = generate_pdf(data)
+            msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
+            msg.body = "Дякуємо за покупку!"
+            for pdf in pdf_paths:
+                with open(pdf[1], 'rb') as f:
+                    msg.attach(f"Квиток №{pdf[0]} {pdf[2]}", "application/pdf", f.read())
+            mail.send(msg)
 
-                payment.status = "Success"
-                payment.end_date = datetime.now()
-                order.status = "Success"
-                db.session.commit()
+            payment.status = "Success"
+            payment.end_date = now
+            order.status = "Success"
+            db.session.commit()
 
-                msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
-                msg.body = "Дякуємо за покупку!"
-                msg.attach(f"Квиток №{data['id']}", "application/pdf", pdf_buffer.read())
-                mail.send(msg)
 
-            answer = {
-                "orderReference": wfp_order_id,
-                "status": "accept",
-                "time": datetime.now().timestamp(),
-            }
-            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
+        answer = {
+            "orderReference": wfp_order_id,
+            "status": "accept",
+            "time": int(now.timestamp()),
+        }
+        answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
 
-            return jsonify(answer), 200
-        else:
-            answer = {
-                "orderReference": data["orderReference"],
-                "status": "accept",
-                "time": datetime.now().timestamp(),
-            }
-            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
+        return jsonify(answer), 200
+    else:
+        answer = {
+            "orderReference": data["orderReference"],
+            "status": "accept",
+            "time": int(now.timestamp()),
+        }
+        answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
 
-            return jsonify(answer), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify(answer), 200
+    # except Exception as e:
+    #     return jsonify({"error": str(e)}), 500
 
 
 @routes.route("/order_status/<int:order_id>/<string:email>", methods=["GET", "POST"])
@@ -281,7 +279,8 @@ def thanks(order_id, email):
     order = OrderController.get_order(order_id)
 
     if order.email == email:
-        ticket = TicketController.get_ticket_by_order_id(order_id)
-        if ticket:
-            return render_template('thanks.html', filename=f"pdf/ticket_{ticket.id}.pdf")
+        tickets = TicketController.get_ticket_by_order_id(order_id)
+        if tickets:
+            tickets_ids = [ticket.id for ticket in tickets]
+            return render_template('thanks.html', tickets=tickets_ids)
     return redirect(url_for('routes.index'))
