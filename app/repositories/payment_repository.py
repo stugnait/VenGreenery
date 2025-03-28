@@ -17,8 +17,8 @@ class PaymentRepository:
         return Payment.query.all()
 
     @staticmethod
-    def create(price, ticket_type, start_date, order, status) -> Payment:
-        new_payment = Payment(price, ticket_type, start_date, None, order, status)
+    def create(price, adult_quantity, child_quantity, start_date, order, status) -> Payment:
+        new_payment = Payment(price, adult_quantity, child_quantity, start_date, None, order, status)
         db.session.add(new_payment)
         db.session.commit()
         return new_payment

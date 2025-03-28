@@ -1,3 +1,5 @@
+from typing import List
+
 from app.models import Ticket
 from app.services import TicketService
 
@@ -9,7 +11,7 @@ class TicketController:
         return TicketService.get_ticket_by_id(ticket_id)
 
     @staticmethod
-    def get_ticket_by_order_id(order_id) -> Ticket:
+    def get_ticket_by_order_id(order_id) -> List[Ticket]:
         return TicketService.get_ticket_by_order_id(order_id)
 
     @staticmethod

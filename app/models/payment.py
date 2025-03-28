@@ -10,7 +10,8 @@ class Payment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     price = db.Column(db.Float, nullable=False)
-    ticket_type = db.Column(db.String, nullable=False)
+    adult_quantity = db.Column(db.Integer, nullable=True)
+    child_quantity = db.Column(db.Integer, nullable=True)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=True)
     order = db.Column(db.Integer, nullable=False)
@@ -20,9 +21,10 @@ class Payment(db.Model):
         ForeignKeyConstraint([order], [Order.id], ondelete='NO ACTION'),
     )
 
-    def __init__(self, price, ticket_type, start_date, end_date, order, status):
+    def __init__(self, price, adult_quantity, child_quantity, start_date, end_date, order, status):
         self.price = price
-        self.ticket_type = ticket_type
+        self.adult_quantity = adult_quantity
+        self.child_quantity = child_quantity
         self.start_date = start_date
         self.end_date = end_date
         self.order = order
