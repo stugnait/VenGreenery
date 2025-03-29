@@ -10,4 +10,6 @@ class Config:
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
+    CACHE_TYPE = 'simple'
+    CACHE_DEFAULT_TIMEOUT = 300
     SECRET_KEY= os.getenv('SECRET_KEY')

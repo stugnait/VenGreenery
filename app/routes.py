@@ -11,7 +11,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.textobject import PDFTextObject
 
-from app import mail, db
+from app import mail, db, cache
 from app.controllers import *
 import qrcode
 from reportlab.pdfgen import canvas
@@ -21,17 +21,15 @@ from app.modules import WayForPay
 
 routes = Blueprint('routes', __name__)
 
+
 @routes.route('/', methods=['GET', 'POST'])
+@cache.cached(timeout=50)
 def index():
-    if request:
-        print(f"Method: {request.method}")
-        print(f"Values: {request.values}")
-        print(f"Data: {request.data}")
-        print(f"Request: {request}")
     return render_template('index.html')
 
 
 @routes.route('/order')
+@cache.cached(timeout=50)
 def do_order():
     return render_template("order.html")
 
@@ -198,6 +196,7 @@ def generate_pdf(ticket_id, ticket_naming, image_path):
 
     return pdf_path
 
+
 def create_qr_ticket(ticket_type, order):
     ticket = TicketController.create_ticket(ticket_type, order.id)
     ticket_naming = 'Дорослий' if ticket_type == 'adult' else 'Дитячий'
@@ -221,64 +220,64 @@ def create_qr_ticket(ticket_type, order):
 
 
 @routes.route("/accept_payment", methods=['POST'])
+@cache.cached(timeout=300)
 def accept_payment():
-    # try:
-    raw_data = next(iter(request.values.keys()), '{}')
-    data = json.loads(raw_data)
-    now = datetime.now()
-    if data["reasonCode"] == 1100:
-        wfp_order_id = data["orderReference"]
-        order_id = wfp_order_id.split("_")[1]
-        order = OrderController.get_order(order_id)
-        if not TicketController.get_ticket_by_order_id(order.id):
-            payment = PaymentController.get_payment_by_order_id(order_id)
+    try:
+        raw_data = next(iter(request.values.keys()), '{}')
+        data = json.loads(raw_data)
+        now = datetime.now()
+        if data["reasonCode"] == 1100:
+            wfp_order_id = data["orderReference"]
+            order_id = wfp_order_id.split("_")[1]
+            order = OrderController.get_order(order_id)
+            if not TicketController.get_ticket_by_order_id(order.id):
+                payment = PaymentController.get_payment_by_order_id(order_id)
 
-            pdf_paths = []
-            for i in range(payment.adult_quantity):
-                pdf_paths.append(create_qr_ticket("adult", order))
+                pdf_paths = []
+                for i in range(payment.adult_quantity):
+                    pdf_paths.append(create_qr_ticket("adult", order))
 
-            for i in range(payment.child_quantity):
-                pdf_paths.append(create_qr_ticket("child", order))
+                for i in range(payment.child_quantity):
+                    pdf_paths.append(create_qr_ticket("child", order))
 
-            msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
-            msg.body = "Дякуємо за покупку!"
-            for pdf in pdf_paths:
-                with open(pdf[1], 'rb') as f:
-                    msg.attach(f"Квиток №{pdf[0]} {pdf[2]}", "application/pdf", f.read())
-            mail.send(msg)
+                msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
+                msg.body = "Дякуємо за покупку!"
+                for pdf in pdf_paths:
+                    with open(pdf[1], 'rb') as f:
+                        msg.attach(f"Квиток №{pdf[0]} {pdf[2]}", "application/pdf", f.read())
+                mail.send(msg)
 
-            payment.status = "Success"
-            payment.end_date = now
-            order.status = "Success"
-            db.session.commit()
+                payment.status = "Success"
+                payment.end_date = now
+                order.status = "Success"
+                db.session.commit()
 
+            answer = {
+                "orderReference": wfp_order_id,
+                "status": "accept",
+                "time": int(now.timestamp()),
+            }
+            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
 
-        answer = {
-            "orderReference": wfp_order_id,
-            "status": "accept",
-            "time": int(now.timestamp()),
-        }
-        answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
+            return jsonify(answer), 200
+        else:
+            answer = {
+                "orderReference": data["orderReference"],
+                "status": "accept",
+                "time": int(now.timestamp()),
+            }
+            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
 
-        return jsonify(answer), 200
-    else:
-        answer = {
-            "orderReference": data["orderReference"],
-            "status": "accept",
-            "time": int(now.timestamp()),
-        }
-        answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
-
-        return jsonify(answer), 200
-    # except Exception as e:
-    #     return jsonify({"error": str(e)}), 500
+            return jsonify(answer), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @routes.route("/order_status/<int:order_id>/<string:email>", methods=["GET", "POST"])
 def thanks(order_id, email):
     order = OrderController.get_order(order_id)
 
-    if order.email == email:
+    if order and order.email == email:
         tickets = TicketController.get_ticket_by_order_id(order_id)
         if tickets:
             tickets_ids = [ticket.id for ticket in tickets]
