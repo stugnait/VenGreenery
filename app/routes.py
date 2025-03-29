@@ -220,19 +220,19 @@ def create_qr_ticket(ticket_type, order):
 
 
 @routes.route("/accept_payment", methods=['POST'])
-@cache.cached(timeout=300)
+@cache.cached(timeout=30)
 def accept_payment():
     try:
         raw_data = next(iter(request.values.keys()), '{}')
         data = json.loads(raw_data)
         now = datetime.now()
-        if data["reasonCode"] == 1100:
-            wfp_order_id = data["orderReference"]
-            order_id = wfp_order_id.split("_")[1]
-            order = OrderController.get_order(order_id)
-            if not TicketController.get_ticket_by_order_id(order.id):
-                payment = PaymentController.get_payment_by_order_id(order_id)
 
+        wfp_order_id = data["orderReference"]
+        order_id = wfp_order_id.split("_")[1]
+        order = OrderController.get_order(order_id)
+        payment = PaymentController.get_payment_by_order_id(order_id)
+        if data["reasonCode"] == 1100:
+            if not TicketController.get_ticket_by_order_id(order.id):
                 pdf_paths = []
                 for i in range(payment.adult_quantity):
                     pdf_paths.append(create_qr_ticket("adult", order))
@@ -251,24 +251,20 @@ def accept_payment():
                 payment.end_date = now
                 order.status = "Success"
                 db.session.commit()
-
-            answer = {
-                "orderReference": wfp_order_id,
-                "status": "accept",
-                "time": int(now.timestamp()),
-            }
-            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
-
-            return jsonify(answer), 200
         else:
-            answer = {
-                "orderReference": data["orderReference"],
-                "status": "accept",
-                "time": int(now.timestamp()),
-            }
-            answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
+            payment.status = "Error"
+            payment.end_date = now
+            order.status = "Error"
+            db.session.commit()
 
-            return jsonify(answer), 200
+        answer = {
+            "orderReference": data["orderReference"],
+            "status": "accept",
+            "time": int(now.timestamp()),
+        }
+        answer["signature"] = WayForPay.get_answer_signature(os.getenv("MERCHANT_SECRET_KEY"), answer)
+
+        return jsonify(answer), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
