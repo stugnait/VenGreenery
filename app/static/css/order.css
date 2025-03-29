@@ -164,6 +164,7 @@ button:hover {
 
 
 .number-container input[type="number"] {
+    text-align: center;
     width: 100%;
     max-width: 150px;
     padding: 12px;
@@ -191,4 +192,20 @@ button:hover {
     flex-direction: row;
     align-items: center;
     justify-content: space-around;
+}
+
+@media (max-width: 768px) {
+    .ticket-container {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .number-container {
+        width: 100%;
+    }
+
+    .number-container input[type="number"] {
+        max-width: 80%;
+    }
 }

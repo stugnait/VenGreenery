@@ -112,9 +112,6 @@ button:hover {
         padding: 15px;
     }
 
-    button {
-        padding: 10px;
-    }
 }
 
 @media (max-width: 480px) {
@@ -132,6 +129,5 @@ button:hover {
 
     button {
         font-size: 14px;
-        padding: 10px;
     }
 }

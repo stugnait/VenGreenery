@@ -108,6 +108,51 @@ button:hover {
     }
 }
 
+
+select {
+    width: 100%;
+    max-width: 400px;
+    padding: 5px;
+    border: 2px solid #e53417; /* Червона рамка, щоб відповідати кнопці */
+    border-radius: 4px;
+    background-color: white; /* Контрастний фон */
+    font-size: 16px;
+    font-family: "Dela Gothic One", Arial, sans-serif;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 5px auto;
+}
+
+select:hover {
+    background-color: #f9f0d4; /* Такий самий фон, як у .container */
+    border-color: #c02b14; /* Трохи темніший червоний */
+}
+
+select:focus {
+    outline: none;
+    border-color: #c02b14;
+    box-shadow: 0 0 5px rgba(192, 43, 20, 0.6);
+}
+
+#my-qr-reader__dashboard_section_csr,
+#html5-qrcode-anchor-scan-type-change,
+select,
+option{
+    font-family: Arial, sans-serif;
+}
+
+/* Для мобільних пристроїв */
+@media (max-width: 768px) {
+    select {
+        width: 100%;
+        font-size: 14px;
+        padding: 5px;
+    }
+}
+
+
 @media (max-width: 480px) {
     header {
         padding: 15px;
