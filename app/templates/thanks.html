@@ -15,15 +15,15 @@
 <body>
 
 <header>
-    <img src="{{ url_for('static', filename='img/logo_red_fixed.png') }}" alt="VenGreenery">
+    <a href="index.html" class="logo">
+        <img src="{{ url_for('static', filename='img/logo_red_fixed.webp') }}" alt="VenGreenery">
+    </a>
 </header>
 
 <div class="container">
-    <div class="success-icon">✔️</div>
     <h1>Оплата успішна!</h1>
     <p>Ваші квитки надіслані на вказану електронну пошту.</p>
     <p>Ви також можете завантажити їх прямо зараз:</p>
-
 
     {% for ticket in tickets %}
         <a href="{{ url_for('static', filename="pdf/ticket_"+ticket|string+".pdf") }}" download class="btn">

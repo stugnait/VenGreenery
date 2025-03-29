@@ -15,7 +15,9 @@
 </head>
 <body>
 <header>
-    <img src="../static/img/logo_red_fixed.png" alt="Logo">
+    <a href="/" class="logo">
+        <img src="{{ url_for('static', filename='img/logo_red_fixed.webp') }}" alt="VenGreenery">
+    </a>
 </header>
 
 <div class="container">
@@ -30,7 +32,9 @@
             <input type="password" id="admin-password" name="admin-password" placeholder="Пароль" required>
         </div>
         <span id="invalid-input"></span>
-        <button type="submit">Увійти</button>
+        <div class="button-container">
+            <button type="submit">Увійти</button>
+        </div>
     </form>
 </div>
 </body>

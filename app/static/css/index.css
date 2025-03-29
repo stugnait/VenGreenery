@@ -14,15 +14,13 @@
 header {
     display: flex;
     color: white;
-    padding: 20px 5%;
+    padding: 10px 5%;
+    height: 40px;
     align-items: center;
-        border-bottom: #e53417 1px solid;
+    border-bottom: #e53417 1px solid;
 }
 
-header img {
-    width: 150px;
-    max-width: 100%;
-}
+
 
 .main-content {
     padding: 0 5%;
@@ -61,24 +59,30 @@ header img {
 }
 
 .hero-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-image img {
     width: 100%;
     height: 100%;
+    object-fit: cover;
 }
 
 .image1 {
-    background: url("../img/photo_3.jpg") no-repeat center/cover;
     grid-row: 1 / 3;
 }
 
 .image2 {
-    background: url("../img/photo_1.jpg") no-repeat center/cover;
     grid-row: 1 / 2;
 }
 
 .image3 {
-    background: url("../img/photo_4.jpg") no-repeat center/cover;
     grid-row: 2 / 3;
 }
+
 
 .hero-button {
     background-color: #e53417;

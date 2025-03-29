@@ -7,15 +7,14 @@
     <link rel="icon" href="../static/img/b&w_logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="preload" as="image" href="../static/img/photo_3.webp" type="image/webp">
 </head>
 <body>
 
 <header>
-    <img src="../static/img/logo_red_fixed.png" alt="VenGreenery">
+    <img src="../static/img/logo_red_fixed.webp" alt="VenGreenery" width="150">
 </header>
 
 <div class="main-content">
@@ -23,14 +22,22 @@
         <div class="hero-text-block">
             <h1 class="header-text hello-text">Ласкаво просимо до <br><span>Ven Greenery!</span></h1>
             <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio nobis obcaecati omnis repellat suscipit voluptas voluptates. Alias consectetur doloribus ducimus, error, iste laborum magnam minus quae quidem, recusandae sit voluptas.
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio nobis obcaecati omnis repellat
+                suscipit voluptas voluptates. Alias consectetur doloribus ducimus, error, iste laborum magnam minus quae
+                quidem, recusandae sit voluptas.
             </p>
             <a href="/order" class="hero-button">Замовити квиток</a>
         </div>
         <div class="hero-image-block">
-            <div class="hero-image image1"></div>
-            <div class="hero-image image2"></div>
-            <div class="hero-image image3"></div>
+            <div class="hero-image image1">
+                <img src="../static/img/photo_3.webp" alt="" fetchpriority="high">
+            </div>
+            <div class="hero-image image2">
+                <img src="../static/img/photo_1.webp" alt="">
+            </div>
+            <div class="hero-image image3">
+                <img src="../static/img/photo_4.webp" alt="">
+            </div>
         </div>
     </div>
 

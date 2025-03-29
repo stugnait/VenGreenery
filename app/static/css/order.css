@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../img/photo_1.jpg') no-repeat center center fixed;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../img/photo_1.webp') no-repeat center center fixed;
     background-size: cover;
     color: #333;
 }
@@ -64,35 +64,6 @@ input:focus {
     border-color: #e53417;
     box-shadow: 0 0 6px rgba(229, 52, 23, 0.4);
     outline: none;
-}
-
-.radio-group {
-    display: flex;
-    gap: 14px;
-    margin-bottom: 24px;
-}
-
-.radio-group input[type="radio"] {
-    display: none;
-}
-
-.radio-group label {
-    display: block;
-    padding: 14px;
-    background: #7a7a7a;
-    color: #fff;
-    border-radius: 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-}
-
-.radio-group input[type="radio"]:checked + label {
-    background-color: #e53417;
-    outline: 3px solid rgba(229, 52, 23, 0.5);
-    color: #fff;
-    transform: scale(1.03);
 }
 
 .button-container {
@@ -177,38 +148,47 @@ button:hover {
     border-radius: 2px;
 }
 
-/* Tabs стилізація */
-.radio-tabs {
+.number-container {
     display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 32px;
-    position: relative;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+    margin-bottom: 24px;
 }
 
-.radio-tabs input[type="radio"] {
-    display: none;
-}
-
-.radio-tabs .tab-label {
-    padding: 14px 26px;
-    border-radius: 12px;
+.number-container label,
+.number-container .price {
     font-weight: 600;
+    margin-bottom: 8px;
+}
+
+
+.number-container input[type="number"] {
+    width: 100%;
+    max-width: 150px;
+    padding: 12px;
     font-size: 16px;
-    color: #fff;
-    background: #7a7a7a;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 2px solid #ccc;
+    background: #fff;
+    transition: 0.3s ease;
 }
 
-.radio-tabs input[type="radio"]:checked + .tab-label {
-    background: #e53417;
-    color: #fff;
-    transform: scale(1.05);
-    box-shadow: 0 0 0 3px rgba(229, 52, 23, 0.3);
+.number-container input[type="number"]:focus {
+    border-color: #e53417;
+    box-shadow: 0 0 6px rgba(229, 52, 23, 0.4);
+    outline: none;
 }
 
-.radio-tabs .tab-label:hover {
-    opacity: 0.85;
+.number-container .price {
+    font-size: 18px;
+    color: #e53417;
+    text-align: center;
+}
+
+.ticket-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
 }

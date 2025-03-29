@@ -1,24 +1,14 @@
 ﻿body {
     margin: 0;
-    padding: 0;
-    font-family: "Dela Gothic One", Arial, sans-serif;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../img/photo_1.webp') no-repeat center center fixed;
+    background-size: cover;
     color: #333;
-    position: relative;
 }
-body::after {
-    content: "";
-    position: fixed; /* Фіксоване затемнення */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: -1; /* Відправляємо затемнення під контент */
-}
+
 
 
 header {
-    background-color: #e53417;
     color: white;
     padding: 20px;
     text-align: center;
@@ -47,12 +37,6 @@ header img {
 
 h1 {
     color: #e53417;
-}
-
-.success-icon {
-    font-size: 50px;
-    color: #e53417;
-    margin-bottom: 10px;
 }
 
 p {
