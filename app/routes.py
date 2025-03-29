@@ -52,7 +52,7 @@ def do_order_post():
 @routes.route('/admin_auth')
 def admin_auth():
     if AuthService.check_session(session):
-        return render_template("admin_dashboard.html")
+        return redirect(url_for("admin_dashboard.html"))
     return render_template("admin_auth.html")
 
 
