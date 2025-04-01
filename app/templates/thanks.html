@@ -25,6 +25,7 @@
     <p>Ваші квитки надіслані на вказану електронну пошту.</p>
     <p>Ви також можете завантажити їх прямо зараз:</p>
 
+    <a href="https://vengreenery.net" class="btn">На головну</a>
     {% for ticket in tickets %}
         <a href="{{ url_for('static', filename="pdf/ticket_"+ticket|string+".pdf") }}" download class="btn">
             Завантажити квиток №{{ ticket }}

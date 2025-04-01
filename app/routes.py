@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import json
 import os
+import re
 from datetime import datetime
 from io import BytesIO
 
@@ -41,7 +42,7 @@ def do_order_post():
         name = request.json.get("name")
         surname = request.json.get("surname")
         email = request.json.get("email")
-        phone = request.json.get("phone")
+        phone = f"+{re.sub(r'\D', '', request.json.get("phone"))}"
         adult_quantity = int(request.json.get("adult_quantity"))
         child_quantity = int(request.json.get("child_quantity"))
         invoice = OrderController.create_order(name, surname, email, phone, adult_quantity, child_quantity)
@@ -60,14 +61,6 @@ def admin_auth():
 @routes.route('/verify_qr', methods=['POST'])
 def verify_qr():
     try:
-        user = None
-        if "email" in session:
-            user = AdminController.get_user_by_email(session["email"])
-        elif "phone" in session:
-            user = AdminController.get_user_by_phone(session["phone"])
-        else:
-            return jsonify({"error": "No user found"})
-
         qr_data = request.json.get('qr_data')
         qr_dict = json.loads(qr_data)
 
@@ -82,20 +75,55 @@ def verify_qr():
         ticket = TicketController.get_ticket(qr_dict["id"])
         order = OrderController.get_order(ticket.order)
         if ticket:
+            ticket_data = {
+                        "id": ticket.id,
+                        "type": ticket.type,
+                        "used": ticket.used,
+                        "create_date": ticket.create_date.strftime("%d.%m.%Y %H:%M:%S"),
+                        "use_date": ticket.use_date.strftime("%d.%m.%Y %H:%M:%S") if ticket.use_date else None,
+                        "name": order.name,
+                        "surname": order.surname,
+                        "email": order.email,
+                        "phone": order.phone
+                    }
             if ticket.used:
-                return jsonify({"error": "Ticket already used."}), 400
+                return jsonify({
+                    "error": "Ticket already used.",
+                    "ticket": ticket_data
+                }), 400
             if name == order.name and surname == order.surname and email == order.email and phone == order.phone:
-                ticket.use_date = datetime.now()
-                ticket.used = True
-                ticket.who_scanned = user.id
-                db.session.commit()
-                return jsonify({"success": "ok"}), 200
+                return jsonify({
+                    "success": "ok",
+                    "ticket": ticket_data
+                }), 200
             return jsonify({"error": "Ticket data isn't equal to QR code data."}), 400
         else:
             return jsonify({"error": "Ticket not found."}), 404
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@routes.route('/activate_ticket', methods=['POST'])
+def activate_ticket():
+    user = None
+    if "email" in session:
+        user = AdminController.get_user_by_email(session["email"])
+    elif "phone" in session:
+        user = AdminController.get_user_by_phone(session["phone"])
+    else:
+        return jsonify({"error": "No user found"})
+
+    ticket_id = request.json.get('ticket_id')
+    ticket = TicketController.get_ticket(ticket_id)
+    now = datetime.now()
+    if ticket:
+        ticket.use_date = now
+        ticket.used = True
+        ticket.who_scanned = user.id
+        db.session.commit()
+        return jsonify({"success": "ok", "use_date":now.strftime("%d.%m.%Y %H:%M:%S")}), 200
+    return jsonify({"error": "Ticket not found."}), 404
+
 
 
 @routes.route("/find_user", methods=['POST'])
