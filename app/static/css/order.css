@@ -81,7 +81,6 @@ button {
     font-weight: 600;
     border: none;
     border-radius: 12px;
-    margin: 0 5px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
@@ -162,6 +161,11 @@ button:hover {
     margin-bottom: 8px;
 }
 
+.number-container .price {
+    font-size: 30px;
+    color: #e53417;
+    text-align: center;
+}
 
 .number-container input[type="number"] {
     text-align: center;
@@ -181,10 +185,13 @@ button:hover {
     outline: none;
 }
 
-.number-container .price {
-    font-size: 18px;
-    color: #e53417;
+
+
+.no-return {
     text-align: center;
+}
+.no-return span {
+    color: #e53417;
 }
 
 .ticket-container {
