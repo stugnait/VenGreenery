@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import json
 import os
@@ -52,7 +53,7 @@ def do_order_post():
 @routes.route('/admin_auth')
 def admin_auth():
     if AuthService.check_session(session):
-        return redirect(url_for("admin_dashboard.html"))
+        return redirect(url_for("routes.admin_dashboard"))
     return render_template("admin_auth.html")
 
 
@@ -197,8 +198,8 @@ def generate_pdf(ticket_id, ticket_naming, image_path):
     return pdf_path
 
 
-def create_qr_ticket(ticket_type, order):
-    ticket = TicketController.create_ticket(ticket_type, order.id)
+def create_qr_ticket(ticket: Ticket, order):
+    ticket_type = ticket.type
     ticket_naming = 'Дорослий' if ticket_type == 'adult' else 'Дитячий'
 
     qr_data = {
@@ -219,6 +220,13 @@ def create_qr_ticket(ticket_type, order):
     return qr_data["id"], pdf_path, ticket_naming
 
 
+async def success_order(order, payment, time):
+    payment.status = "Success"
+    payment.end_date = time
+    order.status = "Success"
+    db.session.commit()
+
+
 @routes.route("/accept_payment", methods=['POST'])
 @cache.cached(timeout=30)
 def accept_payment():
@@ -233,12 +241,12 @@ def accept_payment():
         payment = PaymentController.get_payment_by_order_id(order_id)
         if data["reasonCode"] == 1100:
             if not TicketController.get_ticket_by_order_id(order.id):
-                pdf_paths = []
-                for i in range(payment.adult_quantity):
-                    pdf_paths.append(create_qr_ticket("adult", order))
+                tickets, pdf_paths = [], []
 
-                for i in range(payment.child_quantity):
-                    pdf_paths.append(create_qr_ticket("child", order))
+                for category, quantity in [("adult", payment.adult_quantity), ("child", payment.child_quantity)]:
+                    tickets.extend(TicketController.create_ticket(category, order_id) for _ in range(quantity))
+
+                pdf_paths.extend(create_qr_ticket(ticket, order) for ticket in tickets)
 
                 msg = Message('Ваш квиток до Ven Greenery', recipients=[order.email])
                 msg.body = "Дякуємо за покупку!"
@@ -247,10 +255,8 @@ def accept_payment():
                         msg.attach(f"Квиток №{pdf[0]} {pdf[2]}", "application/pdf", f.read())
                 mail.send(msg)
 
-                payment.status = "Success"
-                payment.end_date = now
-                order.status = "Success"
-                db.session.commit()
+                asyncio.run(success_order(order, payment, now))
+
         else:
             payment.status = "Error"
             payment.end_date = now
