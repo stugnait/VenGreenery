@@ -26,11 +26,12 @@ function onScanSuccess(decodedText) {
                             notification.className = "error show";
                             setTimeout(() => notification.className = "error", 5000);
                             isProcessing = false;
+                        } else {
+                            notification.textContent = "Помилка: Неправильні дані QR коду!";
+                            notification.className = "error show";
+                            setTimeout(() => notification.className = "error", 5000);
+                            isProcessing = false;
                         }
-                        notification.textContent = "Помилка: Неправильні дані QR коду!";
-                        notification.className = "error show";
-                        setTimeout(() => notification.className = "error", 5000);
-                        isProcessing = false;
 
                     }
                 })
@@ -49,7 +50,6 @@ function onScanSuccess(decodedText) {
 }
 
 function showTicketInfo(ticket) {
-    console.log("Відображення модального вікна", ticket);
     scanner.clear();
 
     const modal = document.createElement("div");
@@ -59,17 +59,7 @@ function showTicketInfo(ticket) {
             <h2>Дані квитка</h2>
             <p><b>ID:</b> ${ticket.id}</p>
             <p><b>Тип:</b> ${ticket.type === "child" ? "Дитячий" : "Дорослий"}</p>
-            <p><b>Використано:</b> ${ticket.used ? "Так" : "Ні"}</p>
-            <p><b>Дата створення:</b> ${ticket.create_date}</p>
-            <p><b>Дата використання:</b> ${ticket.use_date || "Ще не використано"}</p>
-            <p><b>Покупець:</b></p>
-            <div class="credentials-wrapper">
-                <div class="credentials">
-                    <p>${ticket.name} ${ticket.surname}</p>
-                    <p>${ticket.phone}</p>
-                    <p>${ticket.email}</p>
-                </div>
-            </div>            
+            <p><b>Використано:</b> ${ticket.used ? "Так" : "Ні"}</p>    
             <div class="modal-button-block">
                 <button id="activate-ticket" ${ticket.used ? "disabled" : ""}>Активувати</button>
                 <button id="close-modal">Закрити</button>
@@ -101,9 +91,7 @@ function activateTicket(ticketId, modal) {
         .then(res => res.json())
         .then(response => {
             if (response.success) {
-                console.log(response);
                 modal.querySelector("p:nth-child(4)").innerHTML = "<strong>Використано:</strong> Так";
-                modal.querySelector("p:nth-child(6)").innerHTML = `<strong>Дата використання:</strong> ${response.use_date}`;
                 const activateButton = document.getElementById("activate-ticket");
                 activateButton.disabled = true
             }

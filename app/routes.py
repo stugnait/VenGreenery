@@ -78,13 +78,7 @@ def verify_qr():
             ticket_data = {
                         "id": ticket.id,
                         "type": ticket.type,
-                        "used": ticket.used,
-                        "create_date": ticket.create_date.strftime("%d.%m.%Y %H:%M:%S"),
-                        "use_date": ticket.use_date.strftime("%d.%m.%Y %H:%M:%S") if ticket.use_date else None,
-                        "name": order.name,
-                        "surname": order.surname,
-                        "email": order.email,
-                        "phone": order.phone
+                        "used": ticket.used
                     }
             if ticket.used:
                 return jsonify({
