@@ -307,3 +307,7 @@ def thanks(order_id, email):
             tickets_ids = [ticket.id for ticket in tickets]
             return render_template('thanks.html', tickets=tickets_ids)
     return redirect(url_for('routes.index'))
+
+@routes.route("/merchant_info", methods=["GET"])
+def merchant_info():
+    return render_template('merchant_info.html')
