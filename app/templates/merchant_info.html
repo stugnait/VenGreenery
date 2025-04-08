@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VenGreenery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/img/b&w_logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/merchant_info.css">
+    <link rel="preload" as="image" href="../static/img/photo_3.webp" type="image/webp">
+</head>
+<body>
+<header>
+    <a href="/" class="logo">
+        <img src="{{ url_for('static', filename='img/logo_red_fixed.webp') }}" alt="VenGreenery">
+    </a>
+</header>
+
+<main>
+    <h1>Додаткова інформація:</h1>
+    <div id="contact-info" class="container">
+        <h2>Контактна інформація</h2>
+        <br>
+        ФОП ВЕНГРИНЮК ВЛАДИСЛАВ ВАСИЛЬОВИЧ
+        <br/>
+        ІПН: 3456416018
+        <br/>
+        <br/>
+        Пошта: Vengreenery@gmail.com
+        <br/>
+        Номер телефону: +38(066)79-22-554
+        <br/>
+        <br/>
+        Юридична адреса:
+        <br/>
+        с.Мамаївці, вулиця Дмитра Гнатюка, 36.
+        <br/>
+        <br/>
+        Фактична адреса:
+        <br/>
+        с.Мамаївці, вулиця Богдана легкого, 2.
+    </div>
+
+
+    <div id="refund-info" class="container">
+        <h2>Правила повернення грошових коштів</h2>
+        <p>Повернення коштів за квитки, придбані за допомогою сайту, <span class="warning-emit">не передбачається</span>
+        </p>
+    </div>
+
+    <div id="terms-info" class="container">
+        <h2>Правила та умови</h2>
+        <ul>
+            <li>Квиток приходить на вказану під час замовлення пошту після оплати.</li>
+            <li>Квиток дійсний протягом усієї виставки тюльпанів 2025.</li>
+        </ul>
+    </div>
+</main>
+<footer>
+    <ul>
+        <li>
+            <a href="/merchant_info#contact-info">
+                Контактна інформація
+            </a>
+        </li>
+        <li>
+            <a href="/merchant_info#refund-info">
+                Refund policy
+            </a>
+        </li>
+        <li>
+            <a href="/merchant_info#terms-info">
+                Terms and conditions
+            </a>
+        </li>
+    </ul>
+</footer>
+</body>
+</html>

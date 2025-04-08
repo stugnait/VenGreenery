@@ -19,19 +19,38 @@
         <img src="{{ url_for('static', filename='img/logo_red_fixed.webp') }}" alt="VenGreenery">
     </a>
 </header>
+<main>
+    <div class="container">
+        <h1>Оплата успішна!</h1>
+        <p>Ваші квитки надіслані на вказану електронну пошту.</p>
+        <p>Ви також можете завантажити їх прямо зараз:</p>
 
-<div class="container">
-    <h1>Оплата успішна!</h1>
-    <p>Ваші квитки надіслані на вказану електронну пошту.</p>
-    <p>Ви також можете завантажити їх прямо зараз:</p>
-
-    <a href="https://vengreenery.net" class="btn">На головну</a>
-    {% for ticket in tickets %}
-        <a href="{{ url_for('static', filename="pdf/ticket_"+ticket|string+".pdf") }}" download class="btn">
-            Завантажити квиток №{{ ticket }}
-        </a>
-    {% endfor %}
-</div>
-
+        <a href="https://vengreenery.net" class="btn">На головну</a>
+        {% for ticket in tickets %}
+            <a href="{{ url_for('static', filename="pdf/ticket_"+ticket|string+".pdf") }}" download class="btn">
+                Завантажити квиток №{{ ticket }}
+            </a>
+        {% endfor %}
+    </div>
+</main>
+<footer>
+    <ul>
+        <li>
+            <a href="/merchant_info#contact-info">
+                Контактна інформація
+            </a>
+        </li>
+        <li>
+            <a href="/merchant_info#refund-info">
+                Refund policy
+            </a>
+        </li>
+        <li>
+            <a href="/merchant_info#terms-info">
+                Terms and conditions
+            </a>
+        </li>
+    </ul>
+</footer>
 </body>
 </html>

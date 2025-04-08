@@ -199,16 +199,34 @@ option{
     gap: 10px;
     margin-top: auto;
 }
-.credentials-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-.credentials {
-    display: inline-block;
+footer {
+    font-family: 'Inter', sans-serif;
+    margin-top: 100px;
+    margin-bottom: 50px;
 }
 
+footer ul {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+footer a {
+    text-decoration: none;
+    color: white;
+    transition: text-shadow 0.3s ease;
+}
+footer a:visited {
+    color: inherit;
+}
+footer a:hover {
+    text-shadow: 0 0 10px white;
+}
 
 /* Для мобільних пристроїв */
 @media (max-width: 768px) {

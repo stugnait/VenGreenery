@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-        rel="stylesheet">
+            href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+            rel="stylesheet">
     <link rel="stylesheet" href="../static/css/admin_auth.css">
     <script src="../static/js/admin_auth.js" defer></script>
     <link rel="icon" href="../static/img/b&w_logo.svg">
@@ -19,23 +19,44 @@
         <img src="{{ url_for('static', filename='img/logo_red_fixed.webp') }}" alt="VenGreenery">
     </a>
 </header>
-
-<div class="container">
-    <h1>Вхід</h1>
-    <form id="auth-from" method="GET" action="/admin_dashboard">
-        <div class="form-group">
-            <label for="admin-credentials">Емейл або телефон:</label>
-            <input type="text" id="admin-credentials" name="admin-credentials" placeholder="Пошта або номер телефону" required>
-        </div>
-        <div class="form-group">
-            <label for="admin-password">Пароль:</label>
-            <input type="password" id="admin-password" name="admin-password" placeholder="Пароль" required>
-        </div>
-        <span id="invalid-input"></span>
-        <div class="button-container">
-            <button type="submit">Увійти</button>
-        </div>
-    </form>
-</div>
+<main>
+    <div class="container">
+        <h1>Вхід</h1>
+        <form id="auth-from" method="GET" action="/admin_dashboard">
+            <div class="form-group">
+                <label for="admin-credentials">Емейл або телефон:</label>
+                <input type="text" id="admin-credentials" name="admin-credentials"
+                       placeholder="Пошта або номер телефону" required>
+            </div>
+            <div class="form-group">
+                <label for="admin-password">Пароль:</label>
+                <input type="password" id="admin-password" name="admin-password" placeholder="Пароль" required>
+            </div>
+            <span id="invalid-input"></span>
+            <div class="button-container">
+                <button type="submit">Увійти</button>
+            </div>
+        </form>
+    </div>
+</main>
+<footer>
+    <ul>
+        <li>
+            <a href="/merchant_info#contact-info">
+                Контактна інформація
+            </a>
+        </li>
+        <li>
+            <a href="/merchant_info#refund-info">
+                Refund policy
+            </a>
+        </li>
+        <li>
+            <a href="/merchant_info#terms-info">
+                Terms and conditions
+            </a>
+        </li>
+    </ul>
+</footer>
 </body>
 </html>

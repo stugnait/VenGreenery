@@ -21,72 +21,92 @@
         <img src="{{ url_for('static', filename='img/logo_red_fixed.webp') }}" alt="VenGreenery">
     </a>
 </header>
+<main>
+    <div class="container">
+        <form id="input-form" method="POST" action="#">
+            <div class="ticket-container">
+                <div class="number-container">
+                    <label for="child-quantity">Дитячий</label>
+                    <span class="price">100 грн</span>
+                    <input id="child-quantity" name="child-quantity" type="number" min="0" value="0">
+                </div>
 
-<div class="container">
-    <form id="input-form" method="POST" action="#">
-        <div class="ticket-container">
-            <div class="number-container">
-                <label for="child-quantity">Дитячий</label>
-                <span class="price">100 грн</span>
-                <input id="child-quantity" name="child-quantity" type="number" min="0" value="0">
+                <div class="number-container">
+                    <label for="adult-quantity">Дорослий</label>
+                    <span class="price">250 грн</span>
+                    <input id="adult-quantity" name="adult-quantity" type="number" min="0" value="0">
+                </div>
             </div>
 
-            <div class="number-container">
-                <label for="adult-quantity">Дорослий</label>
-                <span class="price">250 грн</span>
-                <input id="adult-quantity" name="adult-quantity" type="number" min="0" value="0">
+            <div class="form-group">
+                <label>
+                    <input type="text" id="surname" name="surname" required placeholder="Прізвище">
+                </label>
             </div>
-        </div>
+            <div class="form-group">
+                <label>
+                    <input type="text" id="name" name="name" required placeholder="Ім'я">
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="email" id="email" name="email" required placeholder="Пошта">
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="tel" id="phone" name="phone"
+                           pattern="^\+?\d{1,3}[\s\-]?\(?\d{2,3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$" required
+                           placeholder="Номер телефон">
+                </label>
+            </div>
 
-        <div class="form-group">
-            <label>
-                <input type="text" id="surname" name="surname" required placeholder="Прізвище">
-            </label>
-        </div>
-        <div class="form-group">
-            <label>
-                <input type="text" id="name" name="name" required placeholder="Ім'я">
-            </label>
-        </div>
-        <div class="form-group">
-            <label>
-                <input type="email" id="email" name="email" required placeholder="Пошта">
-            </label>
-        </div>
-        <div class="form-group">
-            <label>
-                <input type="tel" id="phone" name="phone"
-                       pattern="^\+?\d{1,3}[\s\-]?\(?\d{2,3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$" required
-                       placeholder="Номер телефон">
-            </label>
-        </div>
+            <div class="button-container">
+                <button type="submit">Відправити</button>
+            </div>
+        </form>
+    </div>
 
-        <div class="button-container">
-            <button type="submit">Відправити</button>
-        </div>
-    </form>
-</div>
-
-<div class="notes-container">
-    <h1>ℹ️ Примітки</h1>
-    <h2 class="no-return">Повернення квитків <span>не передбачено</span>!</h2>
-    <h3>Безплатний вхід</h3>
+    <div class="notes-container">
+        <h1>ℹ️ Примітки</h1>
+        <h2 class="no-return">Повернення квитків <span>не передбачено</span>!</h2>
+        <h3>Безплатний вхід</h3>
+        <ul>
+            <li>Дітям до 6 років</li>
+            <li>Дітям з інвалідністю до 18 років</li>
+            <li>Дітям Військовослужбовців УБД до 12 років</li>
+        </ul>
+        <h3>Пільговий квиток</h3>
+        <ul>
+            <li>Пенсійне посвідчення – 150 грн</li>
+            <li>Військовослужбовці УБД – 100 грн</li>
+        </ul>
+        <h3>Зауважте!</h3>
+        <ul class="hints-list">
+            <li class="hint-item">* Пільгові квитки продаються тільки за умови надання відповідних документів</li>
+            <li class="hint-item">* Пільговий квиток продається тільки в касах парку</li>
+            <li class="hint-item">* Вхід на територію парку - разовий</li>
+        </ul>
+    </div>
+</main>
+<footer>
     <ul>
-        <li>Дітям до 6 років</li>
-        <li>Дітям з інвалідністю до 18 років</li>
-        <li>Дітям Військовослужбовців УБД до 12 років</li>
+        <li>
+            <a href="/merchant_info#contact-info">
+                Контактна інформація
+            </a>
+        </li>
+        <li>
+            <a href="/merchant_info#refund-info">
+                Refund policy
+            </a>
+        </li>
+        <li>
+            <a href="/merchant_info#terms-info">
+                Terms and conditions
+            </a>
+        </li>
     </ul>
-    <h3>Пільговий квиток</h3>
-    <ul>
-        <li>Пенсійне посвідчення – 150 грн</li>
-        <li>Військовослужбовці УБД – 100 грн</li>
-    </ul>
-    <h3>Зауважте!</h3>
-    <ul class="hints-list">
-        <li class="hint-item">* Пільгові квитки продаються тільки за умови надання відповідних документів</li>
-        <li class="hint-item">* Пільговий квиток продається тільки в касах парку</li>
-        <li class="hint-item">* Вхід на територію парку - разовий</li>
-    </ul>
-</div>
+</footer>
 </body>
 </html>
