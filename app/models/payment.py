@@ -4,8 +4,9 @@ from app.database import db
 from app.models.order import Order
 
 class Payment(db.Model):
-    CHILD_PRICE = 1
-    ADULT_PRICE = 2
+    CHILD_PRICE = 100
+    # CHILD_PRICE = 1
+    ADULT_PRICE = 250
     __tablename__ = 'payment'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

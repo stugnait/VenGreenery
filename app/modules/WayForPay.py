@@ -1,5 +1,6 @@
 ﻿import hashlib
 import hmac
+
 import requests
 
 
@@ -48,7 +49,6 @@ class WayForPay:
         signature = hmac.new(self.key.encode("utf-8"), signature_text.encode("utf-8"), hashlib.md5).hexdigest()
         return signature
 
-
     def create_invoice(self, data):
         try:
             body = {
@@ -74,4 +74,3 @@ class WayForPay:
             raise KeyError(f"No required argument – {e}")
         except Exception as e:
             raise e
-

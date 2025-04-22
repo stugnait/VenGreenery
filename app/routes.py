@@ -34,7 +34,14 @@ def index():
 @cache.cached(timeout=50)
 def do_order():
     return render_template("order.html")
+    # return "Проводяться технічні роботи... Зачекайте, будь ласка."
 
+
+# ##
+# @routes.route('/order_test')
+# def do_order_test():
+#     return render_template("order.html")
+# ##
 
 @routes.route('/order', methods=['POST'])
 def do_order_post():
@@ -76,10 +83,10 @@ def verify_qr():
         order = OrderController.get_order(ticket.order)
         if ticket:
             ticket_data = {
-                        "id": ticket.id,
-                        "type": ticket.type,
-                        "used": ticket.used
-                    }
+                "id": ticket.id,
+                "type": ticket.type,
+                "used": ticket.used
+            }
             if ticket.used:
                 return jsonify({
                     "error": "Ticket already used.",
@@ -96,6 +103,7 @@ def verify_qr():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @routes.route('/activate_ticket', methods=['POST'])
 def activate_ticket():
@@ -115,9 +123,8 @@ def activate_ticket():
         ticket.used = True
         ticket.who_scanned = user.id
         db.session.commit()
-        return jsonify({"success": "ok", "use_date":now.strftime("%d.%m.%Y %H:%M:%S")}), 200
+        return jsonify({"success": "ok", "use_date": now.strftime("%d.%m.%Y %H:%M:%S")}), 200
     return jsonify({"error": "Ticket not found."}), 404
-
 
 
 @routes.route("/find_user", methods=['POST'])
@@ -307,6 +314,7 @@ def thanks(order_id, email):
             tickets_ids = [ticket.id for ticket in tickets]
             return render_template('thanks.html', tickets=tickets_ids)
     return redirect(url_for('routes.index'))
+
 
 @routes.route("/merchant_info", methods=["GET"])
 def merchant_info():

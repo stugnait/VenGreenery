@@ -28,13 +28,21 @@
                 <div class="number-container">
                     <label for="child-quantity">Дитячий</label>
                     <span class="price">100 грн</span>
-                    <input id="child-quantity" name="child-quantity" type="number" min="0" value="0">
+                    <div class="number-input">
+                        <button type="button" class="decrement" data-target="child-quantity">–</button>
+                        <input id="child-quantity" name="child-quantity" type="number" min="0" value="0">
+                        <button type="button" class="increment" data-target="child-quantity">+</button>
+                    </div>
                 </div>
 
                 <div class="number-container">
                     <label for="adult-quantity">Дорослий</label>
                     <span class="price">250 грн</span>
-                    <input id="adult-quantity" name="adult-quantity" type="number" min="0" value="0">
+                    <div class="number-input">
+                        <button type="button" class="decrement" data-target="adult-quantity">–</button>
+                        <input id="adult-quantity" name="adult-quantity" type="number" min="0" value="0">
+                        <button type="button" class="increment" data-target="adult-quantity">+</button>
+                    </div>
                 </div>
             </div>
 

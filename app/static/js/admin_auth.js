@@ -1,4 +1,4 @@
-﻿document.getElementById('auth-from').addEventListener('submit', async (event) => {
+document.getElementById('auth-from').addEventListener('submit', async (event) => {
     event.preventDefault();
 
     let credent = document.getElementById('admin-credentials');

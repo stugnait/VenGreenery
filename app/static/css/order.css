@@ -49,7 +49,8 @@ label {
 
 input[type="text"],
 input[type="email"],
-input[type="tel"] {
+input[type="tel"],
+input[type="number"]{
     width: 100%;
     padding: 16px;
     font-size: 16px;
@@ -87,7 +88,6 @@ button {
 
 button:hover {
     background-color: #c02b14;
-    transform: translateY(-2px);
 }
 
 .notes-container {
@@ -152,6 +152,7 @@ button:hover {
     flex-direction: column;
     align-items: center;
     max-width: 100%;
+    width: 100%;
     margin-bottom: 24px;
 }
 
@@ -170,8 +171,6 @@ button:hover {
 .number-container input[type="number"] {
     text-align: center;
     width: 100%;
-    max-width: 150px;
-    padding: 12px;
     font-size: 16px;
     border-radius: 12px;
     border: 2px solid #ccc;
@@ -196,7 +195,7 @@ button:hover {
 
 .ticket-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: space-around;
 }
@@ -243,4 +242,39 @@ footer a:hover {
     .number-container input[type="number"] {
         max-width: 80%;
     }
+}
+
+
+
+
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+    text-align: center;
+}
+
+.number-input {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ticket-container button {
+    min-width: 56px;
+    height: 56px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ticket-container button:hover {
+    background-color: #c02b14;
 }

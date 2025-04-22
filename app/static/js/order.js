@@ -1,5 +1,43 @@
-﻿$(document).ready(function(){
+$(document).ready(function(){
   $("#phone").mask("+38 (999) 999 99 99");
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const incrementButtons = document.querySelectorAll('.increment');
+    const decrementButtons = document.querySelectorAll('.decrement');
+
+    incrementButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetId = button.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            input.value = parseInt(input.value || 0) + 1;
+        });
+    });
+
+    decrementButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetId = button.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            input.value = Math.max(0, parseInt(input.value || 0) - 1);
+        });
+    });
+
+    const adultQuantity = document.getElementById('adult-quantity');
+    const childQuantity = document.getElementById('child-quantity');
+
+    [adultQuantity, childQuantity].forEach((element) => {
+        element.addEventListener('focus', event => {
+            if (event.target.value === '0') {
+                event.target.value = '';
+            }
+        });
+
+        element.addEventListener('blur', event => {
+            if (event.target.value === '') {
+                event.target.value = '0';
+            }
+        });
+    });
 });
 
 document.getElementById('input-form').addEventListener('submit', event => {
@@ -7,7 +45,6 @@ document.getElementById('input-form').addEventListener('submit', event => {
 
     const emailValue = document.getElementById('email').value;
     const phoneValue = document.getElementById('phone').value;
-    // const ticketType = document.querySelector('input[name="ticket_type"]:checked');
     const userSurnameValue = document.getElementById('surname').value;
     const userNameValue = document.getElementById('name').value;
     const adultQuantityValue = document.getElementById('adult-quantity').value;

@@ -1,4 +1,4 @@
-﻿let isProcessing = false;
+let isProcessing = false;
 const scanner = new Html5QrcodeScanner("my-qr-reader", {fps: 5, qrbox: 300});
 
 function onScanSuccess(decodedText) {

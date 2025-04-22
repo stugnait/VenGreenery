@@ -24,11 +24,9 @@ class PaymentService:
             product_count.append(child_quantity)
             product_price.append(Payment.CHILD_PRICE)
 
-
-
         wfp = WayForPay(os.getenv("MERCHANT_ACCOUNT"), os.getenv("MERCHANT_SECRET_KEY"), os.getenv("MERCHANT_DOMAIN"))
         invoice = wfp.create_invoice({
-            "orderReference": f"test_{order_id}_test_testing_DEV",
+            "orderReference": f"order_{order_id}",
             "orderDate": int(now.timestamp()),
             "orderTimeout": 900, #15 хв на оплату
             "amount": amount,

@@ -1,7 +1,6 @@
 from app.models import Order
 from app.services import OrderService, PaymentService
 
-
 class OrderController:
 
     @staticmethod
